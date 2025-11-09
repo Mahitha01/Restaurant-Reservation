@@ -1,5 +1,8 @@
 package database;
 
+import users.IBooking;
+import users.IUser;
+
 import java.io.*;
 import java.util.*;
 
@@ -15,7 +18,7 @@ public class FilePersistence implements IPersistence {
     }
 
     @Override
-    public void saveReservations(List<IReservation> reservations) throws IOException {
+    public void saveReservations(List<IBooking> reservations) throws IOException {
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(RESERVATIONS_DB))) {
             out.writeObject(reservations);
         }
@@ -33,11 +36,11 @@ public class FilePersistence implements IPersistence {
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<IReservation> loadReservations() throws IOException, ClassNotFoundException {
+    public List<IBooking> loadReservations() throws IOException, ClassNotFoundException {
         File f = new File(RESERVATIONS_DB);
         if (!f.exists()) return new ArrayList<>();
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(f))) {
-            return (List<IReservation>) in.readObject();
+            return (List<IBooking>) in.readObject();
         }
     }
 }
