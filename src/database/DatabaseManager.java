@@ -17,7 +17,9 @@ public class DatabaseManager implements IDatabaseManager {
         synchronized (lock) {
             if (users.containsKey(email)) return false;
 
-            // add user logic here (need user classes)
+            IUser newUser = new users.User(email, password);
+            users.put(email, newUser);
+
             return true;
         }
     }
