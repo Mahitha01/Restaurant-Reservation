@@ -1,20 +1,32 @@
-import java.time.LocalTime;
+package users;
+
 import java.util.ArrayList;
 
-public class Booking  extends User implements BookingInterface{
+public class Booking extends User implements IBooking {
     private int partySize;
     private String bookingTime;
     private ArrayList<String> tables; //in format of #table number, #table Size, #availble or not
     private boolean isAvailable;
+    private int id;
 
-    public Booking(String email, String password, int partySize, String bookingTime) {
+    public Booking(String email, String password, int partySize, String bookingTime, int id) {
         super(email, password);
         this.partySize = partySize;
         this.bookingTime = bookingTime;
+        this.id = id;
+    }
+
+    @Override
+    public String getUserEmail() {
+        return super.getEmail();
     }
 
     public int getPartySize() {
         return partySize;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public String getBookingTime() {
@@ -36,18 +48,16 @@ public class Booking  extends User implements BookingInterface{
         if (tables == null) {
             return false;
         }
-            for (String table : tables) {
-                String[] line = table.split(",");
-                int tableNumber = Integer.parseInt(line[0]);
-                if (tableNumber == target && Boolean.parseBoolean(line[2])) {
-                    return true;
-                }
+
+        for (String table : tables) {
+            String[] line = table.split(",");
+            int tableNumber = Integer.parseInt(line[0]);
+            if (tableNumber == target && Boolean.parseBoolean(line[2])) {
+                return true;
             }
-            return false;
         }
+
+        return false;
     }
-
-
-
-
 }
+
