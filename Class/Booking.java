@@ -1,7 +1,7 @@
 import java.time.LocalTime;
 import java.util.ArrayList;
 
-public class Booking  extends User implements BookingInterface {
+public class Booking  extends User implements BookingInterface{
     private int partySize;
     private String bookingTime;
     private ArrayList<String> tables; //in format of #table number, #table Size, #availble or not
