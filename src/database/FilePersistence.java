@@ -5,7 +5,13 @@ import database.src.users.IUser;
 
 import java.io.*;
 import java.util.*;
-
+/**
+ * This class serializes and deserializes user and reservation data
+ * into our file-based database and handles persistence.
+ *
+ * @author Max, lab sec 02
+ * @version November 11, 2025
+ */
 public class FilePersistence implements IPersistence {
     private static final String USERS_DB = "users.db";
     private static final String RESERVATIONS_DB = "reservations.db";

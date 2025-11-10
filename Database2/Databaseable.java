@@ -1,4 +1,4 @@
-package database;
+package database.Database2;
 
 /**
  * This interface performs adding, removing , and retrieving a Reservation object

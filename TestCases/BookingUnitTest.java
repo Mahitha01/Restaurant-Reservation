@@ -4,6 +4,12 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import java.util.ArrayList;
 
+/**
+ * Test cases for the Booking.java
+ *
+ * @author Mahitha Kodali, lab sec 02
+ * @version November 11, 2025
+ */
 public class BookingUnitTest {
     @Test
     public void testConstructorandGetters() {

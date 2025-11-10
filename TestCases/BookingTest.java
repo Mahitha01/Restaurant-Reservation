@@ -1,8 +1,11 @@
+package database.TestCases;
+
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import database.src.users.Booking;
 import org.junit.Test;
 
 /**

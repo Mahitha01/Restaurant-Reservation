@@ -1,3 +1,6 @@
+package database.TestCases;
+
+import database.src.users.User;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
@@ -8,7 +11,7 @@ import static org.junit.Assert.assertEquals;
  * @version November 8th, 2025
  */
 
-public class UserTest {
+public class  UserTest {
     @Test
     public void testGetters() {
         User user1 = new User("joe@hotmail.com", "1234");

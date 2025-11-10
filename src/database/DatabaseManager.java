@@ -5,7 +5,13 @@ import database.src.users.IUser;
 
 import java.io.*;
 import java.util.*;
-
+/**
+ * Manages all user and booking data and uses FilePersistence.java to store these into the database.
+ * Stores data temporarily and feeds it to FilePersistence.java which stores it to the database.
+ *
+ * @author Max, lab sec 02
+ * @version November 11, 2025
+ */
 public class DatabaseManager implements database.src.database.IDatabaseManager {
     private final Map<String, IUser> users = new HashMap<>();
     private final List<IBooking> reservations = new ArrayList<>();
