@@ -10,11 +10,58 @@ import java.io.IOException;
  * @version November 11, 2025
  */
 public interface IDatabaseManager {
+
+    /**
+     * This method creates a new user with the given email and adds them
+     * to the database
+     *
+     * @param email A String representing the user's email
+     * @param password A String representing the user's password
+     * @return If user was successfully created and added; otherwise return false
+     */
     boolean createUser(String username, String password);
+
+    /**
+     * This method deletes a user from the database based on their username
+     * @param username A String representing the email/username of the user to be deleted
+     * @return If user was successfully deleted; otherwise return false
+     */
     boolean deleteUser(String username);
+
+    /**
+     * This method authenticates a user by checking their email and password
+     * @param email A String representing the email/username of the user
+     * @param password A String representing the password of the user
+     * @return If user exists & the password matches; otherwise return false
+     */
     boolean authenticate(String username, String password);
+
+    /**
+     * This method adds the reservation to the reservations list
+     * and the user's reservation list
+     * @param username A String representing the username of the user
+     * @param r An IBooking object representing the reservation
+     * @return If reservation is successfully added
+     */
     boolean addReservation(String username, IBooking r);
+
+    /**
+     * This method  cancels and removes a reservation by the provided ID
+     * @param reservationId An integer representing the ID of the reservation
+     * @return If the reservation was found and successfully cancelled; otherwise returns false
+     */
     boolean cancelReservation(int reservationId);
+
+    /**
+     * This method saves the current state of users and reservations to files
+     * @throws IOException thrown if an I/O error occurs
+     */
     void save() throws IOException;
+
+    /**
+     * This method loads the stored user and reservation data from files
+     * @throws IOException Thrown if an I/O error occurs
+     * @throws ClassNotFoundException Thrown if the class of a serialized object can't be found
+     */
     void load() throws IOException, ClassNotFoundException;
 }
