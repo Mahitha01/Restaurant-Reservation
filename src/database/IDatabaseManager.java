@@ -1,6 +1,6 @@
-package database;
+package database.src.database;
 
-import users.IBooking;
+import database.src.users.IBooking;
 
 import java.io.IOException;
 

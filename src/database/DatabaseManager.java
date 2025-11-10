@@ -1,12 +1,12 @@
-package database;
+package database.src.database;
 
-import users.IBooking;
-import users.IUser;
+import database.src.users.IBooking;
+import database.src.users.IUser;
 
 import java.io.*;
 import java.util.*;
 
-public class DatabaseManager implements IDatabaseManager {
+public class DatabaseManager implements database.src.database.IDatabaseManager {
     private final Map<String, IUser> users = new HashMap<>();
     private final List<IBooking> reservations = new ArrayList<>();
     private final Object lock = new Object();
@@ -17,7 +17,7 @@ public class DatabaseManager implements IDatabaseManager {
         synchronized (lock) {
             if (users.containsKey(email)) return false;
 
-            IUser newUser = new users.User(email, password);
+            IUser newUser = new database.src.users.User(email, password);
             users.put(email, newUser);
 
             return true;

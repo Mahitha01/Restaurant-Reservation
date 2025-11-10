@@ -1,5 +1,5 @@
 package database.TestCases;
-import database.Class.User;
+import database.src.users.User;
 import org.junit.Test;
 import static org.junit.Assert.*;
 /**

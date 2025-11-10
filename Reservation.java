@@ -1,3 +1,5 @@
+package database;
+
 /**
  * This program implements the interface Reservable and
  * creates a Reservation object and have accessor & mutators for each field

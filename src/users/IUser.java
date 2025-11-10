@@ -1,4 +1,4 @@
-package users;
+package database.src.users;
 
 import java.util.List;
 

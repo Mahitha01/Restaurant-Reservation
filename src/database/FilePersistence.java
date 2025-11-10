@@ -1,7 +1,7 @@
-package database;
+package database.src.database;
 
-import users.IBooking;
-import users.IUser;
+import database.src.users.IBooking;
+import database.src.users.IUser;
 
 import java.io.*;
 import java.util.*;

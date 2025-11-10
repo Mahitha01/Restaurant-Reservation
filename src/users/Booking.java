@@ -1,5 +1,5 @@
-package users;
-
+package database.src.users;
+import java.io.*;
 import java.util.ArrayList;
 
 public class Booking extends User implements IBooking {
@@ -7,13 +7,17 @@ public class Booking extends User implements IBooking {
     private String bookingTime;
     private ArrayList<String> tables; //in format of #table number, #table Size, #availble or not
     private boolean isAvailable;
-    private int id;
+    private int id; //unique id
+    private static int nextId = 1;
+    private static Object lock = new Object();
 
-    public Booking(String email, String password, int partySize, String bookingTime, int id) {
+    public Booking(String email, String password, int partySize, String bookingTime) {
         super(email, password);
         this.partySize = partySize;
         this.bookingTime = bookingTime;
-        this.id = id;
+        synchronized (lock) {
+            this.id = nextId++;
+        }
     }
 
     @Override

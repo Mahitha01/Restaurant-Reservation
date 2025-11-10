@@ -1,4 +1,4 @@
-package users;
+package database.src.users;
 
 public interface IBooking extends java.io.Serializable {
     String getUserEmail();

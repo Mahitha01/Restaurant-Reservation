@@ -1,4 +1,7 @@
+package database;
+
 import java.util.*;
+import java.io.*;
 
 /**
  * This program implements the interface Databaseable and manipulates files and arraylists
@@ -7,7 +10,7 @@ import java.util.*;
  * @author Shawn Shu
  * @version November 7, 2025
  */
-public class ReservationDatabase implements Databaseable{
+public class ReservationDatabase implements Databaseable {
     private FileProcessing file;
     private ArrayList<Reservation> reservations;
     private String fileName;

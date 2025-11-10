@@ -1,3 +1,5 @@
+package database;
+
 import java.util.*;
 /**
  * This interface creates two abstract methods, one returns a List of type String,

@@ -1,3 +1,5 @@
+package database;
+
 /**
  * This interface creates abstract methods for all getters and setters,
  * as well as the toString() method that returns all fields,

@@ -1,3 +1,5 @@
+package database;
+
 /**
  * This interface performs adding, removing , and retrieving a Reservation object
  *
