@@ -18,7 +18,10 @@ public class ReservationDatabaseUnitTest {
         rd.addReservation(r);
         Reservation currentReservation = rd.getReservation("07");
         assertNotNull(currentReservation);
-        assertEquals(r, currentReservation);
+        assertEquals(r.getName(), currentReservation.getName());
+        assertEquals(r.getDate(), currentReservation.getDate());
+        assertEquals(r.getID(), currentReservation.getID());
+        assertEquals(r.getNumGuests(), currentReservation.getNumGuests());
     }
 
     @Test
@@ -30,4 +33,5 @@ public class ReservationDatabaseUnitTest {
         assertEquals(currentReservation, rd.getReservation("08"));
     }
 }
+
 
