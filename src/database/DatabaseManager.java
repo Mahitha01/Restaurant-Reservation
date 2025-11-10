@@ -18,6 +18,14 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
     private final Object lock = new Object();
     private final FilePersistence storage = new FilePersistence();
 
+    /**
+     * This method creates a new user with the given email and adds them
+     * to the database
+     *
+     * @param email A String representing the user's email
+     * @param password A String representing the user's password
+     * @return If user was successfully created and added; otherwise return false
+     */
     @Override
     public boolean createUser(String email, String password) {
         synchronized (lock) {
@@ -30,6 +38,11 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
         }
     }
 
+    /**
+     * This method deletes a user from the database based on their username
+     * @param username A String representing the email/username of the user to be deleted
+     * @return If user was successfully deleted; otherwise return false
+     */
     @Override
     public boolean deleteUser(String username) {
         synchronized (lock) {
@@ -37,6 +50,12 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
         }
     }
 
+    /**
+     * This method authenticates a user by checking their email and password
+     * @param email A String representing the email/username of the user
+     * @param password A String representing the password of the user
+     * @return If user exists & the password matches; otherwise return false
+     */
     @Override
     public boolean authenticate(String email, String password) {
         synchronized (lock) {
@@ -46,6 +65,13 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
         }
     }
 
+    /**
+     * This method adds the reservation to the reservations list
+     * and the user's reservation list
+     * @param username A String representing the username of the user
+     * @param r An IBooking object representing the reservation
+     * @return If reservation is successfully added
+     */
     @Override
     public boolean addReservation(String username, IBooking r) {
         synchronized (lock) {
@@ -56,6 +82,11 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
         }
     }
 
+    /**
+     * This method  cancels and removes a reservation by the provided ID
+     * @param reservationId An integer representing the ID of the reservation
+     * @return If the reservation was found and successfully cancelled; otherwise returns false
+     */
     @Override
     public boolean cancelReservation(int reservationId) {
         synchronized (lock) {
@@ -71,7 +102,10 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
             return false;
         }
     }
-
+    /**
+     * This method saves the current state of users and reservations to files
+     * @throws IOException thrown if an I/O error occurs
+     */
     @Override
     public void save() throws IOException {
         synchronized (lock) {
@@ -79,7 +113,11 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
             storage.saveReservations(reservations);
         }
     }
-
+    /**
+     * This method loads the stored user and reservation data from files
+     * @throws IOException Thrown if an I/O error occurs
+     * @throws ClassNotFoundException Thrown if the class of a serialized object can't be found
+     */
     @Override
     public void load() throws IOException, ClassNotFoundException {
         synchronized (lock) {
