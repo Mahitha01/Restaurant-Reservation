@@ -3,6 +3,12 @@ package database;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+/**
+ * Test cases for Reservation.java
+ * 
+ * @author Shawn Shu, lab sec 02
+ * @version November 8, 2025
+**/
 public class ReservationUnitTest {
     @Test
     public void testConstructor() {
@@ -45,3 +51,4 @@ public class ReservationUnitTest {
 
     }
 }
+
