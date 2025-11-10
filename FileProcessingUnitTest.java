@@ -2,6 +2,12 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import java.util.*;
 
+/**
+ * Test cases for FileProcessing.java
+ * 
+ * @author Shawn Shu, lab sec 02
+ * @version November 8, 2025
+**/
 public class FileProcessingUnitTest {
     @Test
     public void testFileProcessing() {
@@ -16,3 +22,4 @@ public class FileProcessingUnitTest {
         assertEquals(inputInfo, outputInfo);
     }
 }
+
