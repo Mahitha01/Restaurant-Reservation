@@ -1,4 +1,3 @@
-package database.Interface;
 import java.util.ArrayList;
 
 public interface BookingInterface {

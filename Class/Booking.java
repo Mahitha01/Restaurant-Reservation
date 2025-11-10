@@ -1,11 +1,7 @@
-package database.Class;
-import database.Interface.BookingInterface;
-
 import java.time.LocalTime;
 import java.util.ArrayList;
 
-public class Booking extends User implements BookingInterface {
-
+public class Booking  extends User implements BookingInterface {
     private int partySize;
     private String bookingTime;
     private ArrayList<String> tables; //in format of #table number, #table Size, #availble or not
@@ -40,17 +36,18 @@ public class Booking extends User implements BookingInterface {
         if (tables == null) {
             return false;
         }
-        for (String table : tables) {
-            String[] line = table.split(",");
-            int tableNumber = Integer.parseInt(line[0]);
-            if (tableNumber == target && Boolean.parseBoolean(line[2])) {
-                return true;
+            for (String table : tables) {
+                String[] line = table.split(",");
+                int tableNumber = Integer.parseInt(line[0]);
+                if (tableNumber == target && Boolean.parseBoolean(line[2])) {
+                    return true;
+                }
             }
+            return false;
         }
-        return false;
     }
+
+
+
+
 }
-
-
-
-
