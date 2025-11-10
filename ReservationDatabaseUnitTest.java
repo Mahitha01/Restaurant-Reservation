@@ -3,6 +3,13 @@ package database;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import java.util.*;
+
+/**
+ * Test cases for ReservationDatabase.java
+ * 
+ * @author Shawn Shu, lab sec 02
+ * @version November 8, 2025
+**/
 public class ReservationDatabaseUnitTest {
     @Test
     public void testAddingAndGettingReservation() {
@@ -23,3 +30,4 @@ public class ReservationDatabaseUnitTest {
         assertEquals(currentReservation, rd.getReservation("08"));
     }
 }
+
