@@ -10,7 +10,7 @@ package database.Database2;
 public class Reservation implements Reservable {
     private String name;
     private String date;
-    private String ID;
+    private String reserveID;
     private int numGuests;
 
     /**
@@ -18,13 +18,13 @@ public class Reservation implements Reservable {
      *
      * @param name name of the customer
      * @param date reservation date
-     * @param ID reservation ID
+     * @param iD reservation ID
      * @param numGuests number of guests attending
      */
-    public Reservation (String name, String date, String ID, int numGuests) {
+    public Reservation(String name, String date, String iD, int numGuests) {
         this.name = name;
         this.date = date;
-        this.ID = ID;
+        this.reserveID = iD;
         this.numGuests = numGuests;
     }
 
@@ -52,7 +52,7 @@ public class Reservation implements Reservable {
      */
     @Override
     public String getID() {
-        return ID;
+        return reserveID;
     }
 
     /**
@@ -85,11 +85,11 @@ public class Reservation implements Reservable {
 
     /**
      * This method sets the ID field
-     * @param ID A String representing the updated reservation ID
+     * @param iD A String representing the updated reservation ID
      */
     @Override
-    public void setID(String ID) {
-        this.ID = ID;
+    public void setID(String iD) {
+        this.reserveID = iD;
     }
 
     /**
@@ -107,7 +107,7 @@ public class Reservation implements Reservable {
      */
     @Override
     public String toString() {
-        return name + "," + date + "," + ID + "," + numGuests;
+        return name + "," + date + "," + reserveID + "," + numGuests;
     }
 
     /**

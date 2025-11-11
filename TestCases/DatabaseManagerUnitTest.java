@@ -35,7 +35,7 @@ public class DatabaseManagerUnitTest {
     public void testAddandCancelReservation() {
         DatabaseManager dm = new DatabaseManager();
         dm.createUser("user3@gmail.com", "user3Password");
-        IBooking testBooking = new Booking("user3@gmail.com","user3Password",
+        IBooking testBooking = new Booking("user3@gmail.com", "user3Password",
                 4, "19:30");
 
         assertTrue(dm.addReservation("user3@gmail.com", testBooking));
@@ -54,7 +54,7 @@ public class DatabaseManagerUnitTest {
             dm.save();
             dm.load();
             assertTrue(true);
-        } catch (ClassNotFoundException|IOException e) {
+        } catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();
             fail();
         }

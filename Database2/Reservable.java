@@ -48,9 +48,9 @@ public interface Reservable {
 
     /**
      * This method sets the ID field
-     * @param ID A String representing the updated reservation ID
+     * @param reserveID A String representing the updated reservation ID
      */
-    void setID(String ID);
+    void setID(String reserveID);
 
     /**
      * This method sets the numGuests field

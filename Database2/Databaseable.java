@@ -21,9 +21,9 @@ public interface Databaseable {
 
     /**
      * This method returns a Reservation object
-     * @param ID A String representing the reservation ID
+     * @param reserveID A String representing the reservation ID
      * @return A Reservation object found based on the ID
      */
-    Reservation getReservation(String ID);
+    Reservation getReservation(String reserveID);
 }
 

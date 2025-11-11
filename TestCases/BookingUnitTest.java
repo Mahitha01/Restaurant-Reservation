@@ -33,7 +33,8 @@ public class BookingUnitTest {
 
     @Test
     public void testAvailability() {
-        Booking testB = new Booking("user@gmail.com", "userPassword",2, "13:30");
+        Booking testB = new Booking("user@gmail.com", "userPassword",
+                2, "13:30");
         ArrayList<String> t = new ArrayList<>();
         t.add("3,4,true");
         t.add("1,2,true");
