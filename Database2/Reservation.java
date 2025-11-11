@@ -1,4 +1,4 @@
-package database;
+package database.Database2;
 
 /**
  * This program implements the interface Reservable and

@@ -1,4 +1,4 @@
-package database;
+package database.Database2;
 
 /**
  * This interface creates abstract methods for all getters and setters,

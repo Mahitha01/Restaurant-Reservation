@@ -1,11 +1,17 @@
 package database.src.users;
 import java.io.*;
 import java.util.ArrayList;
-
+/**
+ * This class stores a user's booking with details such as number of people,
+ * booking time, and booking ID.
+ *
+ * @author Tommy, lab sec 02
+ * @version November 11, 2025
+ */
 public class Booking extends User implements IBooking {
     private int partySize;
     private String bookingTime;
-    private ArrayList<String> tables; //in format of #table number, #table Size, #availble or not
+    private ArrayList<String> tables; //in format of #table number, #table Size, #available or not
     private boolean isAvailable;
     private int id; //unique id
     private static int nextId = 1;

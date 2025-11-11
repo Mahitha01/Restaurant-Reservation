@@ -8,6 +8,9 @@ import java.util.List;
  * Also can use for deletion as well
  * A user would have an Email and Password, that can be checked by iterating through a list of
  * users in a .txt file
+ *
+ * @author Tommy Wei, lab sec 02
+ * @version November 11, 2025
  */
 public class User implements IUser {
     private String email;

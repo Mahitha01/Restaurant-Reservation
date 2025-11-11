@@ -3,10 +3,10 @@ import database.src.users.User;
 import org.junit.Test;
 import static org.junit.Assert.*;
 /**
- * This tests the user class
+ * Test cases for the User.java
  *
- * @author Mahitha Kodali , lab sec 02
- * @version Nov 7, 2025
+ * @author Mahitha Kodali, lab sec 02
+ * @version November 7, 2025
  */
 public class UserUnitTest {
     @Test
