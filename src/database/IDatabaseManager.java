@@ -15,7 +15,7 @@ public interface IDatabaseManager {
      * This method creates a new user with the given email and adds them
      * to the database
      *
-     * @param email A String representing the user's email
+     * @param username A String representing the user's email
      * @param password A String representing the user's password
      * @return If user was successfully created and added; otherwise return false
      */
@@ -30,7 +30,7 @@ public interface IDatabaseManager {
 
     /**
      * This method authenticates a user by checking their email and password
-     * @param email A String representing the email/username of the user
+     * @param username A String representing the email/username of the user
      * @param password A String representing the password of the user
      * @return If user exists & the password matches; otherwise return false
      */

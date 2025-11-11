@@ -1,6 +1,5 @@
-package database.TestCases;
+package database.Database2;
 
-import database.Database2.Reservation;
 import org.junit.Test;
 import static org.junit.Assert.*;
 

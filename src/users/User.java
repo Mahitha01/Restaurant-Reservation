@@ -16,6 +16,11 @@ public class User implements IUser {
     private String email;
     private String password;
 
+    /**
+     *
+     * @param email
+     * @param password
+     */
     public User(String email, String password) {
         this.email = email;
         this.password = password;

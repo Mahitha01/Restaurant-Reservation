@@ -2,6 +2,7 @@ package database.src.database;
 
 import database.src.users.IBooking;
 import database.src.users.IUser;
+import database.src.users.User;
 
 import java.io.*;
 import java.util.*;
@@ -31,7 +32,7 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
         synchronized (lock) {
             if (users.containsKey(email)) return false;
 
-            IUser newUser = new database.src.users.User(email, password);
+            IUser newUser = new User(email, password);
             users.put(email, newUser);
 
             return true;
