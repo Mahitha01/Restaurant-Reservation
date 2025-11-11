@@ -1,5 +1,5 @@
 package database.src.users;
-
+import database.src.users.IBooking;
 import java.util.List;
 /**
  * Interface for a User. Implemented by User.java

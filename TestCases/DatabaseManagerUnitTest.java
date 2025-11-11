@@ -1,5 +1,5 @@
 package database.TestCases;
-import database.src.database.DatabaseManager;
+import database.src.database1.DatabaseManager;
 import database.src.users.Booking;
 import database.src.users.IBooking;
 import org.junit.Test;

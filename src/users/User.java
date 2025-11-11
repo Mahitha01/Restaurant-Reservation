@@ -1,5 +1,5 @@
 package database.src.users;
-
+import database.src.users.IBooking;
 import java.util.List;
 
 /**
@@ -15,6 +15,7 @@ import java.util.List;
 public class User implements IUser {
     private String email;
     private String password;
+    private List<IBooking> reservations;
 
     /**
      * This constructor initializes the email and password
@@ -58,7 +59,7 @@ public class User implements IUser {
      */
     @Override
     public List<IBooking> getReservations() {
-        return List.of();
+        return reservations;
     }
 
     /**
@@ -67,7 +68,7 @@ public class User implements IUser {
      */
     @Override
     public void addReservation(IBooking r) {
-
+        reservations.add(r);
     }
 
     /**
@@ -76,6 +77,10 @@ public class User implements IUser {
      */
     @Override
     public void cancelReservation(int reservationId) {
-
+        for (int i = 0; i < reservations.size(); i++) {
+            if (reservations.get(i).getId() == reservationId) {
+                reservations.remove(i);
+            }
+        }
     }
 }
