@@ -35,7 +35,7 @@ public class Booking extends User implements IBooking {
 
     /**
      * This method returns email field from the User class
-     * @return An integer representing the users email.
+     * @return A String representing the users email.
      */
     @Override
     public String getUserEmail() {

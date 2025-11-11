@@ -8,7 +8,7 @@ package database.src.users;
 public interface IBooking extends java.io.Serializable {
     /**
      * This method returns email field from the User class
-     * @return An integer representing the users email.
+     * @return A String representing the users email.
      */
     String getUserEmail();
 
