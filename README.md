@@ -1,6 +1,6 @@
 # Team-Project-Phase 1
 
-This phase was completed throught the cooperation and discussion of Mahitha Kondali, Max Weinstein, Raphie Lubiniecki, Tommy Wei, Shawn Shu
+This phase was completed throught the cooperation and discussion of Mahitha Kodali, Max Weinstein, Raphie Lubiniecki, Tommy Wei, Shawn Shu
 
 For the files in Database2 folder, they don't need to be compiled. They were the original version of the database, until later we decided to use Hashmap. However, for test cases ReservableUnitTest.java, ReservationUnitTest.java, and ReservationDatabase.java, as well as all other files in Database2 folder, they were referenced and used to create the DatabaseManager.java and test cases in the database folder(under src). To compile the code, first download the code to a local compiler, ideally Intellij or Vscode, then run the test cases in the test cases folder. Since they should all pass, it means that our code works. 
 
