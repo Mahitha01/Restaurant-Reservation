@@ -1,5 +1,7 @@
 package database.src.users;
 import database.src.users.IBooking;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,6 +27,7 @@ public class User implements IUser {
     public User(String email, String password) {
         this.email = email;
         this.password = password;
+        reservations = new ArrayList<>();
     }
 
     /**
