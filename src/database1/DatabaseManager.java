@@ -1,7 +1,8 @@
-package database.src.database;
+package database.src.database1;
 
 import database.src.users.IBooking;
 import database.src.users.IUser;
+import database.src.users.User;
 
 import java.io.*;
 import java.util.*;
@@ -12,7 +13,7 @@ import java.util.*;
  * @author Max, lab sec 02
  * @version November 11, 2025
  */
-public class DatabaseManager implements database.src.database.IDatabaseManager {
+public class DatabaseManager implements database.src.database1.IDatabaseManager {
     private final Map<String, IUser> users = new HashMap<>();
     private final List<IBooking> reservations = new ArrayList<>();
     private final Object lock = new Object();
@@ -31,7 +32,7 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
         synchronized (lock) {
             if (users.containsKey(email)) return false;
 
-            IUser newUser = new database.src.users.User(email, password);
+            IUser newUser = new User(email, password);
             users.put(email, newUser);
 
             return true;

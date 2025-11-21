@@ -68,13 +68,13 @@ public class ReservationDatabase implements Databaseable {
 
     /**
      * This method returns a Reservation object
-     * @param ID A String representing the reservation ID
+     * @param reserveID A String representing the reservation ID
      * @return A Reservation object found based on the ID
      */
     @Override
-    public synchronized Reservation getReservation(String ID) {
+    public synchronized Reservation getReservation(String reserveID) {
         for (Reservation r: reservations) {
-            if (r.getID().equals(ID)) {
+            if (r.getID().equals(reserveID)) {
                 return r;
             }
         }

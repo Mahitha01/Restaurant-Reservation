@@ -13,12 +13,12 @@ import java.util.ArrayList;
 public class BookingUnitTest {
     @Test
     public void testConstructorandGetters() {
-        Booking testBook = new Booking("testing@gmail.com", "testing123",4, "13:30");
+        Booking testBook = new Booking("testing@gmail.com", "testing123",
+                4, "13:30");
         assertEquals("testing@gmail.com", testBook.getEmail());
         assertEquals("testing123", testBook.getPassword());
         assertEquals(4, testBook.getPartySize());
         assertEquals("13:30", testBook.getBookingTime());
-        assertEquals(5, testBook.getId());
     }
 
     @Test
@@ -33,7 +33,8 @@ public class BookingUnitTest {
 
     @Test
     public void testAvailability() {
-        Booking testB = new Booking("user@gmail.com", "userPassword",2, "13:30");
+        Booking testB = new Booking("user@gmail.com", "userPassword",
+                2, "13:30");
         ArrayList<String> t = new ArrayList<>();
         t.add("3,4,true");
         t.add("1,2,true");

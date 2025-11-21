@@ -1,10 +1,7 @@
-package database.TestCases;
+package database.Database2;
 
-import database.Database2.Reservation;
-import database.Database2.ReservationDatabase;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import java.util.*;
 
 /**
  * Test cases for ReservationDatabase.java
