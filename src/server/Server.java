@@ -148,7 +148,31 @@ public class Server implements Runnable {
             writer.println(totalBookings); // all of the reservations
             writer.flush();
 
-            
+            while(true) {
+                String choice = reader.readLine();
+                if(choice.equals("EXIT")) break;
+                if(choice.equals("ADD_RESERVATION")) {
+                    writer.println("ADD_RESERVATION"); // returns so the user can then input their stuff
+                    writer.flush();
+                    
+                }
+                String[] data = choice.split("-");
+                if(data[0].equals("CANCEL_RESERVATION")) {
+                    String[] reservationToRemove = data[1].split(",");
+                    boolean successfulCancel = dm.cancelReservation(Integer.parseInt(reservationToRemove[2]));
+                    dm.save();
+                    bookings = dm.getUserBookings(userEmailPassword[0]);
+                    for(IBooking booking:bookings) {
+                        totalBookings += String.format("%s,%d,%d ", booking.getBookingTime(), booking.getPartySize(), booking.getId());
+                    }
+                    String toSendBack = "";
+                    if(successfulCancel) toSendBack += "SUCCESS-";
+                    else toSendBack += "FAIL-";
+                    toSendBack += totalBookings;
+                    writer.println(toSendBack);
+                    writer.flush();
+                }
+            }
 
             reader.close();
             writer.close();
