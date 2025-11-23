@@ -1,9 +1,12 @@
+package database.src.client;
+
 import java.util.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.net.*;
 import java.io.*;
+
 
 /**
  * This program implements the client side of a restaurant reservation page;

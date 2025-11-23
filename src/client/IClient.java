@@ -1,3 +1,5 @@
+package database.src.client;
+
 /**
  * This interface contains methods to be implemented in the client class
  *

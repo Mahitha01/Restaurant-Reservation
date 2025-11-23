@@ -1,15 +1,12 @@
 package database.src.server;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
+import java.net.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
 
 import database.src.database1.DatabaseManager;
-import database.src.users.Booking;
 import database.src.users.IBooking;
 
 /**
@@ -57,6 +54,100 @@ public class Server implements Runnable {
     }
 
     /**
+     * This method communicates with the client and the clients choices are all handled.
+     * @param reader is a BufferedReader object that reads from the client
+     * @param writer is a PrintWriter object that writes back to the client
+     * @param dm is a DatabaseManager object that checks if user exists or adds user depending
+     * on if they are logging in or creating an account
+     * @return String array containing email, password
+     */
+    //@Override
+    public String[] login(BufferedReader reader, PrintWriter writer, DatabaseManager dm) throws IOException, ClassNotFoundException{
+        String[] userEmailPassword;
+        loginLoop: while(true) {
+            String loginOptions = reader.readLine();
+            if(loginOptions.equals("OPTION_CREATE_ACCOUNT")) {
+                writer.println("OPTION_CREATE_ACCOUNT");
+                writer.flush();
+                while(true) {
+                    String createAccountOptions = reader.readLine();
+                    if(createAccountOptions.equals("BACK")) {
+                        writer.println("BACK");
+                        writer.flush();
+                        continue loginLoop;
+                    }
+                    String[] emailPassword = createAccountOptions.split(" ");
+                    dm.load();
+                    if(dm.createUser(emailPassword[0], emailPassword[1])) {
+                        writer.println("SUCCESS_CREATE_ACCOUNT");
+                        writer.flush();
+                        dm.save();
+                        userEmailPassword = emailPassword;
+                        break loginLoop;
+                    }
+                    writer.println("INVALID_CREATE_ACCOUNT");
+                    writer.flush();
+                }
+            }
+            String[] emailPassword = loginOptions.split(" ");
+            if(dm.authenticate(emailPassword[0], emailPassword[1])) {
+                userEmailPassword = emailPassword;
+                writer.println("RIGHT_CREDENTIALS");
+                writer.flush();
+                break;
+            } else {
+                writer.println("WRONG_CREDENTIALS");
+                writer.flush();
+            }
+        }
+        return userEmailPassword;
+    }
+
+    /**
+     * This method manages the bookings of the user who is logged in.
+     * @param reader BufferedReader object that reads from the client
+     * @param writer PrintWriter object that writes back to the client
+     * @param dm DatabaseManager object to update the user's data
+     * @param userEmailPassword the String array containing the user's information
+     */
+    //@Override
+    public void reserve(BufferedReader reader, PrintWriter writer, DatabaseManager dm, String[] userEmailPassword) throws IOException{
+        List<IBooking> bookings = dm.getUserBookings(userEmailPassword[0]);
+        String totalBookings = "";
+        for(IBooking booking : bookings) {
+            totalBookings += String.format("%s,%d,%d ", booking.getBookingTime(), booking.getPartySize(), booking.getId());
+        }
+        writer.println(totalBookings); // all of the reservations
+        writer.flush();
+
+        while(true) {
+            String choice = reader.readLine();
+            if(choice.equals("EXIT")) break;
+            if(choice.equals("ADD_RESERVATION")) {
+                writer.println("ADD_RESERVATION"); // returns so the user can then input their stuff
+                writer.flush();
+
+            }
+            String[] data = choice.split("-");
+            if(data[0].equals("CANCEL_RESERVATION")) {
+                String[] reservationToRemove = data[1].split(",");
+                boolean successfulCancel = dm.cancelReservation(Integer.parseInt(reservationToRemove[2]));
+                dm.save();
+                bookings = dm.getUserBookings(userEmailPassword[0]);
+                for(IBooking booking:bookings) {
+                    totalBookings += String.format("%s,%d,%d ", booking.getBookingTime(), booking.getPartySize(), booking.getId());
+                }
+                String toSendBack = "";
+                if(successfulCancel) toSendBack += "SUCCESS-";
+                else toSendBack += "FAIL-";
+                toSendBack += totalBookings;
+                writer.println(toSendBack);
+                writer.flush();
+            }
+        }
+    }
+
+    /**
      * Thread that is created when a user connects
      * This allows multiple users to connect at the same time
      * 
@@ -99,80 +190,10 @@ public class Server implements Runnable {
             dm.load();
             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter writer = new PrintWriter(socket.getOutputStream());
-            // all of this for the login section
-            String[] userEmailPassword;
-            loginLoop: while(true) {
-                String loginOptions = reader.readLine(); 
-                if(loginOptions.equals("OPTION_CREATE_ACCOUNT")) {
-                    writer.println("OPTION_CREATE_ACCOUNT");
-                    writer.flush();
-                    while(true) {
-                        String createAccountOptions = reader.readLine();
-                        if(createAccountOptions.equals("BACK")) {
-                            writer.println("BACK");
-                            writer.flush();
-                            continue loginLoop;
-                        }
-                        String[] emailPassword = createAccountOptions.split(" ");
-                        dm.load();
-                        if(dm.createUser(emailPassword[0], emailPassword[1])) {
-                            writer.println("SUCCESS_CREATE_ACCOUNT");
-                            writer.flush();
-                            dm.save();
-                            userEmailPassword = emailPassword;
-                            break loginLoop;
-                        }
-                        writer.println("INVALID_CREATE_ACCOUNT");
-                        writer.flush();
-                    }
-                }
-                String[] emailPassword = loginOptions.split(" ");
-                if(dm.authenticate(emailPassword[0], emailPassword[1])) {
-                    userEmailPassword = emailPassword;
-                    writer.println("RIGHT_CREDENTIALS");
-                    writer.flush();
-                    break;
-                } else {
-                    writer.println("WRONG_CREDENTIALS");
-                    writer.flush();
-                }
-            }
-            // end login section
 
-            // begin reservation section
-            List<IBooking> bookings = dm.getUserBookings(userEmailPassword[0]);
-            String totalBookings = "";
-            for(IBooking booking:bookings) {
-                totalBookings += String.format("%s,%d,%d ", booking.getBookingTime(), booking.getPartySize(), booking.getId());
-            }
-            writer.println(totalBookings); // all of the reservations
-            writer.flush();
+            String[] userEmailPassword = login(reader, writer, dm);
 
-            while(true) {
-                String choice = reader.readLine();
-                if(choice.equals("EXIT")) break;
-                if(choice.equals("ADD_RESERVATION")) {
-                    writer.println("ADD_RESERVATION"); // returns so the user can then input their stuff
-                    writer.flush();
-                    
-                }
-                String[] data = choice.split("-");
-                if(data[0].equals("CANCEL_RESERVATION")) {
-                    String[] reservationToRemove = data[1].split(",");
-                    boolean successfulCancel = dm.cancelReservation(Integer.parseInt(reservationToRemove[2]));
-                    dm.save();
-                    bookings = dm.getUserBookings(userEmailPassword[0]);
-                    for(IBooking booking:bookings) {
-                        totalBookings += String.format("%s,%d,%d ", booking.getBookingTime(), booking.getPartySize(), booking.getId());
-                    }
-                    String toSendBack = "";
-                    if(successfulCancel) toSendBack += "SUCCESS-";
-                    else toSendBack += "FAIL-";
-                    toSendBack += totalBookings;
-                    writer.println(toSendBack);
-                    writer.flush();
-                }
-            }
+            reserve(reader, writer, dm, userEmailPassword);
 
             reader.close();
             writer.close();

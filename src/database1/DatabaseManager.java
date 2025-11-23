@@ -50,7 +50,7 @@ public class DatabaseManager implements database.src.database1.IDatabaseManager 
             return users.remove(username) != null;
         }
     }
-
+    
     /**
      * This method authenticates a user by checking their email and password
      * @param email A String representing the email/username of the user
@@ -83,6 +83,19 @@ public class DatabaseManager implements database.src.database1.IDatabaseManager 
         }
     }
 
+    /**
+     * This method returns a specific user's reservations
+     * @param email A string representing the user's email
+     * @return an Arraylist of all the reservations or an empty list if none exist
+     */
+    @Override
+    public List<IBooking> getUserBookings(String email) {
+        IUser user = users.get(email);
+        if (user == null) {
+            return new ArrayList<>();
+        }
+        return user.getReservations();
+    }
     /**
      * This method  cancels and removes a reservation by the provided ID
      * @param reservationId An integer representing the ID of the reservation

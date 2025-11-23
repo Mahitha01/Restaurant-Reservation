@@ -3,6 +3,8 @@ package database.src.database1;
 import database.src.users.IBooking;
 
 import java.io.IOException;
+import java.util.List;
+
 /**
  * Interface to manage users and bookings/reservations. Implemented by DatabaseManager.java
  *
@@ -44,6 +46,13 @@ public interface IDatabaseManager {
      * @return If reservation is successfully added
      */
     boolean addReservation(String username, IBooking r);
+
+    /**
+     * This method returns a specific user's reservations
+     * @param email A string representing the user's email
+     * @return an Arraylist of all the reservations or an empty list if none exist
+     */
+    List<IBooking> getUserBookings(String email);
 
     /**
      * This method  cancels and removes a reservation by the provided ID
