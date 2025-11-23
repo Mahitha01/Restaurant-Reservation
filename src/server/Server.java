@@ -44,7 +44,7 @@ public class Server implements Runnable {
             while (true) {
                 System.out.println("Waiting...");
                 Socket clientSocket = serverSocket.accept();
-                System.out.println("Fount client! "+clientSocket.getLocalAddress());
+                System.out.println("Found client! " + clientSocket.getLocalAddress());
                 Thread clientThread = new Thread(new Server(clientSocket));
                 clientThread.start();
             }
@@ -62,47 +62,45 @@ public class Server implements Runnable {
      * @return String array containing email, password
      */
     //@Override
-    public String[] login(BufferedReader reader, PrintWriter writer, DatabaseManager dm) throws IOException, ClassNotFoundException{
-        String[] userEmailPassword;
-        loginLoop: while(true) {
-            String loginOptions = reader.readLine();
-            if(loginOptions.equals("OPTION_CREATE_ACCOUNT")) {
-                writer.println("OPTION_CREATE_ACCOUNT");
-                writer.flush();
-                while(true) {
-                    String createAccountOptions = reader.readLine();
-                    if(createAccountOptions.equals("BACK")) {
-                        writer.println("BACK");
-                        writer.flush();
-                        continue loginLoop;
-                    }
-                    String[] emailPassword = createAccountOptions.split(" ");
-                    dm.load();
-                    if(dm.createUser(emailPassword[0], emailPassword[1])) {
-                        writer.println("SUCCESS_CREATE_ACCOUNT");
-                        writer.flush();
-                        dm.save();
-                        userEmailPassword = emailPassword;
-                        break loginLoop;
-                    }
-                    writer.println("INVALID_CREATE_ACCOUNT");
-                    writer.flush();
-                }
-            }
-            String[] emailPassword = loginOptions.split(" ");
-            if(dm.authenticate(emailPassword[0], emailPassword[1])) {
-                userEmailPassword = emailPassword;
-                writer.println("RIGHT_CREDENTIALS");
-                writer.flush();
-                break;
-            } else {
-                writer.println("WRONG_CREDENTIALS");
-                writer.flush();
-            }
+    public String[] login(String email, String password, BufferedReader reader, PrintWriter writer, DatabaseManager dm) throws IOException, ClassNotFoundException{
+        String[] userDetails = new String[0];
+        if(dm.authenticate(email, password)) {
+            userDetails = new String[]{email, password};
+            writer.println("RIGHT_CREDENTIALS");
+            writer.flush();
+        } else {
+            writer.println("WRONG_CREDENTIALS");
+            writer.flush();
         }
-        return userEmailPassword;
+        return userDetails;
     }
 
+    public String[] createAccount(String email, String password, BufferedReader reader,
+                                  PrintWriter writer, DatabaseManager dm) throws IOException {
+        String[] userDetails = new String[0];
+        if (dm.createUser(email, password)) {
+            writer.println("SUCCESS_CREATE_ACCOUNT");
+            writer.flush();
+            dm.save();
+            userDetails = new String[]{email, password};
+        } else {
+            writer.println("INVALID_CREATE_ACCOUNT");
+            writer.flush();
+        }
+        return userDetails;
+    }
+
+    public void deleteAccount(String username, BufferedReader reader, PrintWriter writer,
+                              DatabaseManager dm) throws IOException {
+        if (dm.deleteUser(username)) {
+            writer.println("DELETED_SUCCESSFULLY");
+            writer.flush();
+            dm.save();
+        } else {
+            writer.println("DELETE_FAILED");
+            writer.flush();
+        }
+    }
     /**
      * This method manages the bookings of the user who is logged in.
      * @param reader BufferedReader object that reads from the client
@@ -190,10 +188,27 @@ public class Server implements Runnable {
             dm.load();
             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter writer = new PrintWriter(socket.getOutputStream());
+            String line = reader.readLine();
+            while (line != null) {
+                String[] content = line.split(" ");
+                String action = content[0];
+                String[] userDetails = new String[0];
 
-            String[] userEmailPassword = login(reader, writer, dm);
-
-            reserve(reader, writer, dm, userEmailPassword);
+                switch(action) {
+                    case "CREATE_ACCOUNT":
+                        userDetails = createAccount(content[1], content[2], reader, writer, dm);
+                        break;
+                    case "LOGIN":
+                        userDetails = login(content[1], content[2], reader, writer, dm);
+                        break;
+                    case "DELETE_ACCOUNT":
+                        deleteAccount(content[1], reader, writer, dm);
+                        break;
+                    case "RESERVE":
+                        reserve(reader, writer, dm, userDetails);
+                        break;
+                }
+            }
 
             reader.close();
             writer.close();
@@ -203,5 +218,10 @@ public class Server implements Runnable {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void main(String[] args) {
+        Server s = new Server(null);
+        s.start();
     }
 }
