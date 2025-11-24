@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import database.src.database1.FilePersistence;
+import database.src.database.FilePersistence;
 import org.junit.Test;
 
 import database.src.users.Booking;

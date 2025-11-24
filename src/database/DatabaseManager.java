@@ -1,4 +1,4 @@
-package database.src.database1;
+package database.src.database;
 
 import database.src.users.IBooking;
 import database.src.users.IUser;
@@ -13,7 +13,7 @@ import java.util.*;
  * @author Max, lab sec 02
  * @version November 11, 2025
  */
-public class DatabaseManager implements database.src.database1.IDatabaseManager {
+public class DatabaseManager implements database.src.database.IDatabaseManager {
     private final Map<String, IUser> users = new HashMap<>();
     private final List<IBooking> reservations = new ArrayList<>();
     private final Object lock = new Object();

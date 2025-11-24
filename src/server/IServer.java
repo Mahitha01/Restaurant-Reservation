@@ -1,6 +1,6 @@
 package database.src.server;
 
-import database.src.database1.DatabaseManager;
+import database.src.database.DatabaseManager;
 import java.io.*;
 
 public interface IServer {

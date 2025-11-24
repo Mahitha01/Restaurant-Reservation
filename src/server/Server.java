@@ -1,13 +1,12 @@
-package server;
+package database.src.server;
 
 import java.io.*;
-import java.net.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import database.src.database1.DatabaseManager;
+import database.src.database.DatabaseManager;
 import database.src.users.IBooking;
 
 /**

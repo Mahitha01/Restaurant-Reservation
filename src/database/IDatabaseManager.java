@@ -1,4 +1,4 @@
-package database.src.database1;
+package database.src.database;
 
 import database.src.users.IBooking;
 
