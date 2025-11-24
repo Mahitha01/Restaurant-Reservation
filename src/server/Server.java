@@ -1,4 +1,4 @@
-package database.src.server;
+package server;
 
 import java.io.*;
 import java.net.*;
@@ -202,9 +202,14 @@ public class Server implements Runnable {
             DatabaseManager dm = new DatabaseManager();
             dm.load();
             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintWriter writer = new PrintWriter(socket.getOutputStream());
+            PrintWriter writer = new PrintWriter(socket.getOutputStream(), true);
             String line = reader.readLine();
             while (line != null) {
+                try {
+                    dm.load();
+                } catch (IOException | ClassNotFoundException ex) {
+                    ex.printStackTrace();
+                }
                 String[] content = line.split(" ");
                 String action = content[0];
                 String[] userDetails = new String[0];
@@ -223,6 +228,7 @@ public class Server implements Runnable {
                         reserve(reader, writer, dm, userDetails);
                         break;
                 }
+                line = reader.readLine();
             }
 
             reader.close();
