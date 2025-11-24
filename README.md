@@ -32,7 +32,3 @@ Our DatabaseManager class implements the IDatabaseManager interface and serves a
 authentication, and our data storage. It includes methods to create and delete users, authenticate logins, add reservations, and cancel existing ones. We used
 synchronization to ensure concurrency works without issue. So if a new reservation is made, our data is updated to avoid conflicts. We used DatabaseManagerUnitTest.java to
 test our methods. Our testing outcomes pass all the test cases, which means that database did perform as expected. 
-
-
-# Phase 2
-
