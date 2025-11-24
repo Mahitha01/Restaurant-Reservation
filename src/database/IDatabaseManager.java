@@ -3,6 +3,7 @@ package database.src.database;
 import database.src.users.IBooking;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,6 +23,20 @@ public interface IDatabaseManager {
      * @return If user was successfully created and added; otherwise return false
      */
     boolean createUser(String username, String password);
+
+    /**
+     * This method adds a day with all the available tables
+     * @param date A String in the format of mm,dd,time
+     * @param tables An arraylist containing the available tables
+     */
+    void addDay(String date, ArrayList<String> tables);
+
+    /**
+     * This method returns the available tables for a particular day
+     * @param day A String containing the day wanted.
+     * @return An arrayList of tables available
+     */
+    ArrayList<String> getAvailTables(String day);
 
     /**
      * This method deletes a user from the database based on their username
