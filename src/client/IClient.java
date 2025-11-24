@@ -14,7 +14,7 @@ public interface IClient {
     public void connect();
 
     /**
-     * This method disconnects the client from the server
+     * This method disconnects the client with the server
      *
      */
     public void disconnect();
@@ -26,50 +26,38 @@ public interface IClient {
     public void setGUI();
 
     /**
+     * This method allows user to go back to the set GUI page
+     *
+     */
+    public void goback();
+    /**
      * This method creates the login page;
-     * Login information is sent to the server for validation
+     * Login information are sent to server for validation
      *
      */
     public void loginPage();
 
     /**
      * This method creates the create account page;
-     * Account information is sent to the server to be stored in the database
+     * Account information are sent to server to store in database
      *
      */
     public void createAccountPage();
 
     /**
      * This method creates the delete account page;
-     * Deleted account information will be sent to the server to remove from the database
+     * Deleted account information will be sent to server to remove from database
      */
     public void deleteAccount();
 
     /**
-     * This method displays the available time slots;
-     * All times are sent from the server
-     *
+     * This method allows the user to choose a reservation based on the date and time,
+     * or cancel a reservation based on reservation id;
+     * The client sends the information to the server, which stores it in the database;
+     * If a reservation is successful the client side will display it using simple GUI
+     * @param email A String representing the username
+     * @param password A String representing the password
+     * @param bookings A String containing all the reservations
      */
-    public void getAvailableTime();
-
-    /**
-     * This method displays the available tables;
-     * All tables are sent from the server
-     *
-     */
-    public void getAvailableTable();
-
-    /**
-     * This method sends reservation information to the server;
-     * The server stores the reservation information in the database
-     *
-     */
-    public void addReservation();
-
-    /**
-     * This method sends cancel reservation information to the server;
-     * The server removes the reservation information from the database
-     */
-    public void cancelReservation();
+    public void reservationPage(String email, String password, String bookings);
 }
-
