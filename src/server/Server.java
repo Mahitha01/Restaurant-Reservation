@@ -5,7 +5,8 @@ import java.net.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
-
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import database.src.database1.DatabaseManager;
 import database.src.users.IBooking;
 
@@ -22,7 +23,7 @@ public class Server implements Runnable {
     private Socket socket;
     private static Object lock = new Object();
 
-    /**
+    /**1
      * This constructor creates a Server object
      * When a client connects to the server, a new server object is created
      * and a new thread is created.
@@ -112,6 +113,9 @@ public class Server implements Runnable {
     public void reserve(BufferedReader reader, PrintWriter writer, DatabaseManager dm, String[] userEmailPassword) throws IOException{
         List<IBooking> bookings = dm.getUserBookings(userEmailPassword[0]);
         String totalBookings = "";
+        LocalDateTime currentTime = LocalDateTime.now();
+        DateTimeFormatter formattedTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String timeTracker = "";
         for(IBooking booking : bookings) {
             totalBookings += String.format("%s,%d,%d ", booking.getBookingTime(), booking.getPartySize(), booking.getId());
         }
@@ -122,6 +126,17 @@ public class Server implements Runnable {
             String choice = reader.readLine();
             if(choice.equals("EXIT")) break;
             if(choice.equals("ADD_RESERVATION")) {
+
+                if (bookings.size() >= 3) { // Makes sure the user does not overbook
+                    writer.println("USER_BOOKING_LIMIT_REACHED");
+                    writer.flush();
+                    continue;
+                } else if (Integer.parseInt(totalBookings) > 15) { //Checks to make sure there are tables available before user booking
+                    writer.println("NO_TABLES_AVAILABLE");
+                    writer.flush();
+                    continue;
+                }
+                timeTracker = currentTime.format(formattedTime); //Updates to the time everytime a succesfull booking is made
                 writer.println("ADD_RESERVATION"); // returns so the user can then input their stuff
                 writer.flush();
 
