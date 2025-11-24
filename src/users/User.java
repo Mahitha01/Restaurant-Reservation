@@ -62,7 +62,9 @@ public class User implements IUser {
      */
     @Override
     public List<IBooking> getReservations() {
-        return reservations;
+        synchronized (this) {
+            return new ArrayList<>(reservations);
+        }
     }
 
     /**
@@ -71,7 +73,9 @@ public class User implements IUser {
      */
     @Override
     public void addReservation(IBooking r) {
-        reservations.add(r);
+        synchronized (this) {
+            reservations.add(r);
+        }
     }
 
     /**
@@ -80,9 +84,11 @@ public class User implements IUser {
      */
     @Override
     public void cancelReservation(int reservationId) {
-        for (int i = 0; i < reservations.size(); i++) {
-            if (reservations.get(i).getId() == reservationId) {
-                reservations.remove(i);
+        synchronized (this) {
+            for (int i = 0; i < reservations.size(); i++) {
+                if (reservations.get(i).getId() == reservationId) {
+                    reservations.remove(i);
+                }
             }
         }
     }

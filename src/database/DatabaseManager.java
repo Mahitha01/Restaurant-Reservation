@@ -90,11 +90,13 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
      */
     @Override
     public List<IBooking> getUserBookings(String email) {
-        IUser user = users.get(email);
-        if (user == null) {
-            return new ArrayList<>();
+        synchronized (lock) {
+            IUser user = users.get(email);
+            if (user == null) {
+                return new ArrayList<>();
+            }
+            return new ArrayList<>(user.getReservations());
         }
-        return user.getReservations();
     }
     /**
      * This method  cancels and removes a reservation by the provided ID
@@ -142,4 +144,3 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
         }
     }
 }
-
