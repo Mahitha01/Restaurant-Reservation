@@ -15,6 +15,7 @@ import java.util.*;
 public class FilePersistence implements IPersistence {
     private static final String USERS_DB = "users.db";
     private static final String RESERVATIONS_DB = "reservations.db";
+    private static final Object lock = new Object();
     /**
      * This method saves the map of users to a file named "users.db"
      * using serialization
@@ -22,9 +23,11 @@ public class FilePersistence implements IPersistence {
      * @throws IOException Thrown if an I/O Error occurs
      */
     @Override
-    public void synchronized saveUsers(Map<String, IUser> users) throws IOException {
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(USERS_DB))) {
-            out.writeObject(users);
+    public void saveUsers(Map<String, IUser> users) throws IOException {
+        synchronized(lock) {
+            try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(USERS_DB))) {
+                out.writeObject(users);
+            }
         }
     }
     /**
@@ -35,9 +38,11 @@ public class FilePersistence implements IPersistence {
      * @throws IOException Thrown if an I/O error occurs
      */
     @Override
-    public void synchronized saveReservations(List<IBooking> reservations) throws IOException {
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(RESERVATIONS_DB))) {
-            out.writeObject(reservations);
+    public void saveReservations(List<IBooking> reservations) throws IOException {
+        synchronized(lock) {
+            try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(RESERVATIONS_DB))) {
+                out.writeObject(reservations);
+            }
         }
     }
     /**
@@ -50,10 +55,12 @@ public class FilePersistence implements IPersistence {
     @SuppressWarnings("unchecked")
     @Override
     public Map<String, IUser> loadUsers() throws IOException, ClassNotFoundException {
-        File f = new File(USERS_DB);
-        if (!f.exists()) return new HashMap<>();
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(f))) {
-            return (Map<String, IUser>) in.readObject();
+        synchronized(lock) {
+            File f = new File(USERS_DB);
+            if (!f.exists()) return new HashMap<>();
+            try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(f))) {
+                return (Map<String, IUser>) in.readObject();
+            }
         }
     }
     /**
@@ -66,10 +73,12 @@ public class FilePersistence implements IPersistence {
     @SuppressWarnings("unchecked")
     @Override
     public List<IBooking> loadReservations() throws IOException, ClassNotFoundException {
-        File f = new File(RESERVATIONS_DB);
-        if (!f.exists()) return new ArrayList<>();
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(f))) {
-            return (List<IBooking>) in.readObject();
+        synchronized(lock) {
+            File f = new File(RESERVATIONS_DB);
+            if (!f.exists()) return new ArrayList<>();
+            try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(f))) {
+                return (List<IBooking>) in.readObject();
+            }
         }
     }
 }

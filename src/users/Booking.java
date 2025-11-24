@@ -92,6 +92,14 @@ public class Booking extends User implements IBooking {
     }
 
     /**
+     * This method returns the tables arrayList
+     * @return tables arraylist
+     */
+    public ArrayList<String> getTables() {
+        return tables;
+    }
+
+    /**
      * This method checks the availability of a specific table
      * @param target An integer representing the table number wanting to be checked
      * @return true if table is available and false if isn't
