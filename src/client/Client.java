@@ -1,14 +1,8 @@
 package database.src.client;
-
-import java.util.*;
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.*;
 import java.net.*;
 import java.io.*;
-import java.util.Timer;
-
-
 
 /**
  * This program implements the client side of a restaurant reservation page;
@@ -35,7 +29,7 @@ public class Client {
     }
 
     /**
-     * This method connects the client with the server
+     * This method connects the client to the server
      *
      */
     //@Override
@@ -47,10 +41,11 @@ public class Client {
             System.out.println("Connected to server");
         } catch (IOException e) {
             e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Failed to connect to server");
         }
     }
     /**
-     * This method disconnects the client from the server
+     * This method disconnects the client with the server
      *
      */
     //@Override
@@ -77,7 +72,7 @@ public class Client {
     //@Override
     public void setGUI() {
         frame = new JFrame("Restaurant Reservation");
-        frame.setSize(800, 600);
+        frame.setSize(700, 400);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         panel = new JPanel();
         frame.add(panel);
@@ -95,6 +90,7 @@ public class Client {
         JButton deleteAccountButton = new JButton("Delete Account");
         deleteAccountButton.setBounds(450, 30, 150, 30);
         panel.add(deleteAccountButton);
+
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -118,12 +114,50 @@ public class Client {
 
     }
 
-//    public void buttonMenu() {
-//
-//    }
+    /**
+     * This method allows user to go back to the set GUI page
+     *
+     */
+    public void goback() {
+        panel.removeAll();
+        panel.repaint();
+
+        JButton loginButton = new JButton("Login");
+        loginButton.setBounds(50, 30, 150, 30);
+        panel.add(loginButton);
+
+        JButton createAccountButton = new JButton("Create Account");
+        createAccountButton.setBounds(250, 30, 150, 30);
+        panel.add(createAccountButton);
+
+        JButton deleteAccountButton = new JButton("Delete Account");
+        deleteAccountButton.setBounds(450, 30, 150, 30);
+        panel.add(deleteAccountButton);
+
+        loginButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                loginPage();
+            }
+        });
+
+        createAccountButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                createAccountPage();
+            }
+        });
+
+        deleteAccountButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                deleteAccount();
+            }
+        });
+    }
     /**
      * This method creates the login page;
-     * Login information is sent to the server for validation
+     * Login information are sent to server for validation
      *
      */
     //@Override
@@ -150,26 +184,47 @@ public class Client {
         submitLoginButton.setBounds(100, 80, 100, 25);
         panel.add(submitLoginButton);
 
+        JButton menu = new JButton("Go back");
+        menu.setBounds(500, 30, 150, 30);
+        panel.add(menu);
+
         submitLoginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String email = emailTextField.getText();
                 String password = new String(passwordField.getPassword());
                 writer.println("LOGIN " + email + " " + password);
+                writer.flush();
                 try {
                     String response = reader.readLine();
                     JOptionPane.showMessageDialog(frame, response);
+                    if (response.equals("RIGHT_CREDENTIALS")) {
+                        writer.println("RESERVE " + email + " " + password);
+                        writer.flush();
+                        String bookings = reader.readLine();
+                        System.out.println("Bookings: " + bookings);
+                        if (bookings == null) {
+                            bookings = "Error in server";
+                        }
+                        reservationPage(email, password, bookings);
+                    }
                 } catch(IOException ex) {
                     ex.printStackTrace();
                 }
             }
         });
 
+        menu.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                goback();
+            }
+        });
     }
 
     /**
      * This method creates the create account page;
-     * Account information is sent to the server to be stored in the database
+     * Account information are sent to server to store in database
      *
      */
     public void createAccountPage() {
@@ -195,6 +250,10 @@ public class Client {
         createAccountButton.setBounds(150, 80, 150, 25);
         panel.add(createAccountButton);
 
+        JButton menu = new JButton("Go back");
+        menu.setBounds(500, 30, 150, 30);
+        panel.add(menu);
+
         createAccountButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -209,10 +268,17 @@ public class Client {
                 }
             }
         });
+
+        menu.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                goback();
+            }
+        });
     }
     /**
      * This method creates the delete account page;
-     * Deleted account information will be sent to the server to remove from the database
+     * Deleted account information will be sent to server to remove from database
      */
     public void deleteAccount() {
         panel.removeAll();
@@ -229,6 +295,10 @@ public class Client {
         deleteAccountButton.setBounds(100, 80, 150, 25);
         panel.add(deleteAccountButton);
 
+        JButton menu = new JButton("Go back");
+        menu.setBounds(500, 30, 150, 30);
+        panel.add(menu);
+
         deleteAccountButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -242,6 +312,121 @@ public class Client {
                 }
             }
         });
+
+        menu.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                goback();
+            }
+        });
+    }
+
+    /**
+     * This method allows the user to choose a reservation based on the date and time,
+     * or cancel a reservation based on reservation id;
+     * The client sends the information to the server, which stores it in the database;
+     * If a reservation is successful the client side will display it using simple GUI
+     * @param email A String representing the username
+     * @param password A String representing the password
+     * @param bookings A String containing all the reservations
+     */
+    public void reservationPage(String email, String password, String bookings) {
+        panel.removeAll();
+        panel.repaint();
+
+        //1
+        JLabel dateLabel = new JLabel("MM-DD-YYYY");
+        dateLabel.setBounds(20, 50, 200, 25);
+        panel.add(dateLabel);
+
+        JTextField dateTextField = new JTextField();
+        dateTextField.setBounds(20, 80, 200, 25);
+        panel.add(dateTextField);
+
+        JLabel timeLabel = new JLabel("Time");
+        timeLabel.setBounds(20, 120, 200, 25);
+        panel.add(timeLabel);
+
+        JTextField timeTextField = new JTextField();
+        timeTextField.setBounds(20, 150, 200, 25);
+        panel.add(timeTextField);
+
+
+
+
+
+        //2
+        JButton reserveButton = new JButton("Confirm Reservation");
+        reserveButton.setBounds(20, 180, 160, 30);
+        panel.add(reserveButton);
+
+        //3
+        JLabel bookingsLabel = new JLabel("Current Bookings:");
+        bookingsLabel.setBounds(350, 50, 200, 25);
+        panel.add(bookingsLabel);
+
+        JTextArea bookingsTextArea = new JTextArea(5, 30);
+        bookingsTextArea.setEditable(false);
+        bookingsTextArea.setText(bookings);
+
+        JScrollPane bookingsScrollPane = new JScrollPane(bookingsTextArea);
+        bookingsScrollPane.setBounds(350, 80, 300, 100);
+        panel.add(bookingsScrollPane);
+
+        //4
+        JLabel cancelLabel = new JLabel("Cancel Reservation(enter booking ID):");
+        cancelLabel.setBounds(350, 200, 300, 25);
+        panel.add(cancelLabel);
+
+        JTextField cancelTextField = new JTextField();
+        cancelTextField.setBounds(350, 250, 150, 25);
+        panel.add(cancelTextField);
+
+        JButton cancelButton = new JButton("Confirm cancellation");
+        cancelButton.setBounds(350, 280, 150, 30);
+        panel.add(cancelButton);
+
+        reserveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String date = dateTextField.getText();
+                String time = timeTextField.getText();
+
+                writer.println("MAKE_RESERVATION " + email + " " + date + " " + time);
+
+                try {
+                    String response = reader.readLine();
+                    JOptionPane.showMessageDialog(frame, response);
+
+                    writer.println("RESERVE " + email + " " + password);
+                    String updated = reader.readLine();
+                    bookingsTextArea.setText(updated);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+        cancelButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String id = cancelTextField.getText();
+                writer.println("CANCEL_RESERVATION " + email + " " + id);
+
+                try {
+                    String response = reader.readLine();
+                    JOptionPane.showMessageDialog(frame, response);
+
+                    writer.println("RESERVE " + email + " " + password);
+                    String updated = reader.readLine();
+                    bookingsTextArea.setText(updated);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+        panel.repaint();
     }
     public static void main(String[] args) {
         Client client = new Client();
@@ -249,4 +434,3 @@ public class Client {
         client.setGUI();
     }
 }
-
