@@ -22,7 +22,7 @@ public class FilePersistence implements IPersistence {
      * @throws IOException Thrown if an I/O Error occurs
      */
     @Override
-    public void saveUsers(Map<String, IUser> users) throws IOException {
+    public void synchronized saveUsers(Map<String, IUser> users) throws IOException {
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(USERS_DB))) {
             out.writeObject(users);
         }
@@ -35,7 +35,7 @@ public class FilePersistence implements IPersistence {
      * @throws IOException Thrown if an I/O error occurs
      */
     @Override
-    public void saveReservations(List<IBooking> reservations) throws IOException {
+    public void synchronized saveReservations(List<IBooking> reservations) throws IOException {
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(RESERVATIONS_DB))) {
             out.writeObject(reservations);
         }
