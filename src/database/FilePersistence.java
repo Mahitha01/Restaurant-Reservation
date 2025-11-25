@@ -24,7 +24,7 @@ public class FilePersistence implements IPersistence {
      */
     @Override
     public void saveUsers(Map<String, IUser> users) throws IOException {
-        synchronized(lock) {
+        synchronized (lock) {
             try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(USERS_DB))) {
                 out.writeObject(users);
             }
@@ -39,7 +39,7 @@ public class FilePersistence implements IPersistence {
      */
     @Override
     public void saveReservations(List<IBooking> reservations) throws IOException {
-        synchronized(lock) {
+        synchronized (lock) {
             try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(RESERVATIONS_DB))) {
                 out.writeObject(reservations);
             }
@@ -55,7 +55,7 @@ public class FilePersistence implements IPersistence {
     @SuppressWarnings("unchecked")
     @Override
     public Map<String, IUser> loadUsers() throws IOException, ClassNotFoundException {
-        synchronized(lock) {
+        synchronized (lock) {
             File f = new File(USERS_DB);
             if (!f.exists()) return new HashMap<>();
             try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(f))) {
@@ -73,7 +73,7 @@ public class FilePersistence implements IPersistence {
     @SuppressWarnings("unchecked")
     @Override
     public List<IBooking> loadReservations() throws IOException, ClassNotFoundException {
-        synchronized(lock) {
+        synchronized (lock) {
             File f = new File(RESERVATIONS_DB);
             if (!f.exists()) return new ArrayList<>();
             try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(f))) {

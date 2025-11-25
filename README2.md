@@ -2,7 +2,7 @@
 
 This phase was completed with the cooperation and discussion of Mahitha Kodali, Max Weinstein, Raphie Lubiniecki, Tommy Wei, Shawn Shu
 
-Things changed from phase 1: added 'synchronized' keyword to saveUsers() and saveReservations() in FilePersistence.java. We also created more methods in DatabaseManager which we also created testCases for.
+Things changed from phase 1: added 'synchronized' keyword to saveUsers() and saveReservations() in FilePersistence.java.
 
 To compile the code, first download the code to a local compiler, ideally Intellij or VsCode, then run the ServerUnitTest file in the test cases folder. Since this file passes, it means that our code works. 
 

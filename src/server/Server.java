@@ -14,8 +14,8 @@ import database.src.users.IBooking;
  * Server side for program, gets user information and calls database to store
  * information
  *
- * @author Raphie Lubiniecki, lab sec 02
- * @version November 17th, 2025
+ * @author Mahitha Kodali, lab sec 02
+ * @version November 24, 2025
  */
 
 public class Server implements Runnable {
@@ -63,9 +63,10 @@ public class Server implements Runnable {
      * @return String array containing email, password
      */
     //@Override
-    public String[] login(String email, String password, BufferedReader reader, PrintWriter writer, DatabaseManager dm) throws IOException, ClassNotFoundException{
+    public String[] login(String email, String password, BufferedReader reader, PrintWriter writer, DatabaseManager dm)
+            throws IOException, ClassNotFoundException {
         String[] userDetails = new String[0];
-        if(dm.authenticate(email, password)) {
+        if (dm.authenticate(email, password)) {
             userDetails = new String[]{email, password};
             writer.println("RIGHT_CREDENTIALS");
             writer.flush();
@@ -76,6 +77,16 @@ public class Server implements Runnable {
         return userDetails;
     }
 
+    /**
+     * This method creates an account
+     * @param email a string representing the user's email
+     * @param password a string representing the user's password
+     * @param reader a BufferedReader object to read from the client
+     * @param writer A printWriter object to write back to the client
+     * @param dm A DatabaseManager object used for creating a user
+     * @return an Array of strings that have the userdetails
+     * @throws IOException from writing or saving in database
+     */
     public String[] createAccount(String email, String password, BufferedReader reader,
                                   PrintWriter writer, DatabaseManager dm) throws IOException {
         String[] userDetails = new String[0];
@@ -91,6 +102,14 @@ public class Server implements Runnable {
         return userDetails;
     }
 
+    /**
+     * This methods deletes an account with username
+     * @param username the username of the user who wants to delete their account
+     * @param reader a BufferedReader object to read from the client
+     * @param writer A printWriter object to write back to the client
+     * @param dm A DatabaseManager object used for deleting the user
+     * @throws IOException from writing or saving in database
+     */
     public void deleteAccount(String username, BufferedReader reader, PrintWriter writer,
                               DatabaseManager dm) throws IOException {
         if (dm.deleteUser(username)) {
@@ -133,7 +152,7 @@ public class Server implements Runnable {
         boolean booked = dm.addReservation(content[1], booking);
         try {
             dm.save();
-        } catch(IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         if (booked) {
@@ -143,6 +162,12 @@ public class Server implements Runnable {
         }
     }
 
+    /**
+     * This method cancels a reservation
+     * @param id the unique id given per reservation
+     * @param writer A printWriter object used for communicating with the server
+     * @param dm A DatabaseManager object used for cancelling a reservation.
+     */
     public void cancelReserve(int id, PrintWriter writer, DatabaseManager dm) {
         boolean success = dm.cancelReservation(id);
 

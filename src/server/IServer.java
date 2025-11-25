@@ -3,6 +3,11 @@ package database.src.server;
 import database.src.database.DatabaseManager;
 import java.io.*;
 
+/**
+ * This is an interface for the Server class
+ * @author Mahitha Kodali, lab sec 02
+ * @version November 24, 2025
+ */
 public interface IServer {
     /**
      * Starts the server
@@ -18,7 +23,8 @@ public interface IServer {
      * on if they are logging in or creating an account
      * @return String array containing email, password
      */
-    String[] login(BufferedReader reader, PrintWriter writer, DatabaseManager dm) throws IOException, ClassNotFoundException;
+    String[] login(BufferedReader reader, PrintWriter writer, DatabaseManager dm)
+            throws IOException, ClassNotFoundException;
 
     /**
      * This method manages the bookings of the user who is logged in.
@@ -27,7 +33,8 @@ public interface IServer {
      * @param dm DatabaseManager object to update the user's data
      * @param userEmailPassword the String array containing the user's information
      */
-    void reserve(BufferedReader reader, PrintWriter writer, DatabaseManager dm, String[] userEmailPassword) throws IOException;
+    void reserve(BufferedReader reader, PrintWriter writer, DatabaseManager dm, String[] userEmailPassword)
+            throws IOException;
 
     /**
      * Thread that is created when a user connects

@@ -45,7 +45,7 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
      * @param tables An arraylist containing the available tables
      */
     public void addDay(String date, ArrayList<String> tables) {
-        synchronized(lock) {
+        synchronized (lock) {
             tablesPerDay.put(date, tables);
         }
     }
@@ -56,7 +56,7 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
      * @return An arrayList of tables available
      */
     public ArrayList<String> getAvailTables(String day) {
-        synchronized(lock) {
+        synchronized (lock) {
             return tablesPerDay.get(day);
         }
     }
@@ -68,7 +68,7 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
      * @return true if table is available and false if isn't
      */
     public boolean isAvailable(String day, int target) { // {3,4,true}
-        synchronized(lock) {
+        synchronized (lock) {
             ArrayList<String> tables = tablesPerDay.get(day);
             if (tables == null) {
                 return false;
@@ -90,7 +90,7 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
      * @return An arrayList that contains the available tables that can hold the partySize
      */
     public ArrayList<String> getAvailTables(String day, int partySize) {
-        synchronized(lock) {
+        synchronized (lock) {
             ArrayList<String> result = new ArrayList<>();
 
             ArrayList<String> tables = tablesPerDay.get(day);
@@ -120,7 +120,7 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
             return users.remove(username) != null;
         }
     }
-    
+
     /**
      * This method authenticates a user by checking their email and password
      * @param email A String representing the email/username of the user

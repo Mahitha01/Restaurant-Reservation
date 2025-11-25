@@ -61,7 +61,7 @@ public class Client {
                 writer.close();
             }
             System.out.println("Disconnected from server");
-        } catch(IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -208,7 +208,7 @@ public class Client {
                         }
                         reservationPage(email, password, bookings);
                     }
-                } catch(IOException ex) {
+                } catch (IOException ex) {
                     ex.printStackTrace();
                 }
             }
@@ -403,7 +403,8 @@ public class Client {
                 String time = timeTextField.getText();
                 int partySize = Integer.parseInt(partySizeTextField.getText());
 
-                writer.println("MAKE_RESERVATION " + email + " " + password + " " + partySize + " " + date + " " + time);
+                writer.println("MAKE_RESERVATION " + email + " " + password + " " +
+                        partySize + " " + date + " " + time);
 
                 try {
                     String response = reader.readLine();
