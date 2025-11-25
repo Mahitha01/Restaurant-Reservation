@@ -108,8 +108,9 @@ public class Server implements Runnable {
      * @param email A string representing the user's email
      * @param writer A PrintWriter object that communicates with the client
      * @param dm A DatabaseManager object that finds this specific user's bookings.
+     * @return A string containing all bookings
      */
-    public void getBookings(String email, PrintWriter writer, DatabaseManager dm) {
+    public String getBookings(String email, PrintWriter writer, DatabaseManager dm) {
         List<IBooking> books = dm.getUserBookings(email);
         String bookings = "";
         for (IBooking b : books) {
@@ -117,6 +118,7 @@ public class Server implements Runnable {
                     ", Time: " + b.getBookingTime() + ", ID: " + b.getId() + ";";
         }
         writer.println(bookings);
+        return bookings;
     }
 
     /**

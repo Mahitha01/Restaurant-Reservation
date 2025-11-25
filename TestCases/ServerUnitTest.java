@@ -74,4 +74,29 @@ public class ServerUnitTest {
         assertFalse(dm.authenticate("nouser", "anyPass"));
     }
 
+    @Test
+    public void testGetBookings() throws IOException, ClassNotFoundException {
+        new File("users.db").delete();
+        new File("reservations.db").delete();
+
+        DatabaseManager dm = new DatabaseManager();
+        dm.load();
+
+        Server server = new Server(null);
+
+        PrintWriter pwTest = new PrintWriter(new StringWriter());
+
+        dm.createUser("testBook@gmail.com", "testBookpass");
+
+        IBooking b1 = new Booking("testBook@gmail.com", "testBookpass", 6, "12-01-2025 13:00");
+        IBooking b2 = new Booking("testBook@gmail.com", "testBookpass", 4, "11-30-2025 18:30");
+
+        dm.addReservation("testBook@gmail.com", b1);
+        dm.addReservation("testBook@gmail.com", b2);
+
+        String[] result = server.getBookings("testBook@gmail.com", pwTest, dm).split(";");
+
+        assertTrue(result[0].contains("PartySize: 6, Time: 12-01-2025 13:00"));
+        assertTrue(result[1].contains("PartySize: 4, Time: 11-30-2025 18:30"));
+    }
 }
