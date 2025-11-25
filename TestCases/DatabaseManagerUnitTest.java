@@ -5,6 +5,7 @@ import database.src.users.IBooking;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 /**
@@ -59,4 +60,20 @@ public class DatabaseManagerUnitTest {
             fail();
         }
     }
+
+    /*@Test
+    public void testAvailability() {
+        DatabaseManager dm = new DatabaseManager();
+        ArrayList<String> t = new ArrayList<>();
+        t.add("3,4,true");
+        t.add("1,2,true");
+        t.add("2,10,true");
+        t.add("4,2,false");
+        dm.setTables(t);
+
+        assertTrue(dm.isAvailable(3));
+        assertTrue(dm.isAvailable(1));
+        assertTrue(dm.isAvailable(2));
+        assertFalse(dm.isAvailable(4));
+    }*/
 }

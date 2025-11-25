@@ -7,6 +7,7 @@ import java.util.List;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import database.src.database.DatabaseManager;
+import database.src.users.Booking;
 import database.src.users.IBooking;
 
 /**
@@ -101,59 +102,57 @@ public class Server implements Runnable {
             writer.flush();
         }
     }
+
     /**
-     * This method manages the bookings of the user who is logged in.
-     * @param reader BufferedReader object that reads from the client
-     * @param writer PrintWriter object that writes back to the client
-     * @param dm DatabaseManager object to update the user's data
-     * @param userEmailPassword the String array containing the user's information
+     * This method sends back all the bookings this user has already made
+     * @param email A string representing the user's email
+     * @param writer A PrintWriter object that communicates with the client
+     * @param dm A DatabaseManager object that finds this specific user's bookings.
      */
-    //@Override
-    public void reserve(BufferedReader reader, PrintWriter writer, DatabaseManager dm, String[] userEmailPassword) throws IOException{
-        List<IBooking> bookings = dm.getUserBookings(userEmailPassword[0]);
-        String totalBookings = "";
-        LocalDateTime currentTime = LocalDateTime.now();
-        DateTimeFormatter formattedTime = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String timeTracker = "";
-        for(IBooking booking : bookings) {
-            totalBookings += String.format("%s,%d,%d ", booking.getBookingTime(), booking.getPartySize(), booking.getId());
+    public void getBookings(String email, PrintWriter writer, DatabaseManager dm) {
+        List<IBooking> books = dm.getUserBookings(email);
+        String bookings = "";
+        for (IBooking b : books) {
+            bookings += "PartySize: " + b.getPartySize() +
+                    ", Time: " + b.getBookingTime() + ", ID: " + b.getId() + ";";
         }
-        writer.println(totalBookings); // all of the reservations
-        writer.flush();
-        String line = reader.readLine();
-        if(line.equals("EXIT")) return;
-        if(line.equals("ADD_RESERVATION")) {
+        writer.println(bookings);
+    }
 
-            if (bookings.size() >= 3) { // Makes sure the user does not overbook
-                writer.println("USER_BOOKING_LIMIT_REACHED");
-                writer.flush();
-                return;
-            } else if (Integer.parseInt(totalBookings) > 15) { //Checks to make sure there are tables available before user booking
-                writer.println("NO_TABLES_AVAILABLE");
-                writer.flush();
-                return;
-            }
-            timeTracker = currentTime.format(formattedTime); //Updates to the time everytime a succesfull booking is made
-            writer.println("ADD_RESERVATION"); // returns so the user can then input their stuff
-            writer.flush();
-
+    /**
+     * This method makes a reservation
+     * @param content a string array containing the details the client entered
+     * @param writer A printWriter object used for communicating with the server
+     * @param dm A DatabaseManager object used for adding a reservation to the database.
+     */
+    public void makeReservation(String[] content, PrintWriter writer, DatabaseManager dm) {
+        String dateTime = content[4] + " " + content[5];
+        IBooking booking = new Booking(content[1], content[2], Integer.parseInt(content[3]), dateTime);
+        boolean booked = dm.addReservation(content[1], booking);
+        try {
+            dm.save();
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+        if (booked) {
+            writer.println("SUCCESSFULLY_RESERVED");
         } else {
-            String[] data = line.split("-");
-            if (data[0].equals("CANCEL_RESERVATION")) {
-                String[] reservationToRemove = data[1].split(",");
-                boolean successfulCancel = dm.cancelReservation(Integer.parseInt(reservationToRemove[2]));
-                dm.save();
-                bookings = dm.getUserBookings(userEmailPassword[0]);
-                for (IBooking booking : bookings) {
-                    totalBookings += String.format("%s,%d,%d ", booking.getBookingTime(), booking.getPartySize(), booking.getId());
-                }
-                String toSendBack = "";
-                if (successfulCancel) toSendBack += "SUCCESS-";
-                else toSendBack += "FAIL-";
-                toSendBack += totalBookings;
-                writer.println(toSendBack);
-                writer.flush();
-            }
+            writer.println("RESERVATION_FAILED");
+        }
+    }
+
+    public void cancelReserve(int id, PrintWriter writer, DatabaseManager dm) {
+        boolean success = dm.cancelReservation(id);
+
+        try {
+            dm.save();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (success) {
+            writer.println("SUCCESSFULLY_CANCELLED");
+        } else {
+            writer.println("CANCELLATION_FAILED");
         }
     }
 
@@ -221,8 +220,14 @@ public class Server implements Runnable {
                     case "DELETE_ACCOUNT":
                         deleteAccount(content[1], reader, writer, dm);
                         break;
-                    case "RESERVE":
-                        reserve(reader, writer, dm, userDetails);
+                    case "GET_BOOKINGS":
+                        getBookings(content[1], writer, dm);
+                        break;
+                    case "MAKE_RESERVATION":
+                        makeReservation(content, writer, dm);
+                        break;
+                    case "CANCEL_RESERVATION":
+                        cancelReserve(Integer.parseInt(content[1]), writer, dm);
                         break;
                 }
                 line = reader.readLine();

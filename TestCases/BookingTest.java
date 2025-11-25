@@ -61,23 +61,4 @@ public class BookingTest {
         assertEquals(2, book2.getPartySize());
         assertEquals("8:00", book2.getBookingTime());
     }
-
-    @Test
-    public void testIsAvailable() {
-        Booking book1 = new Booking("harrypotter@yahoo.edu", "vvvvv", 4, "10:45");
-        ArrayList<String> tables1 = new ArrayList<>(Arrays.asList("1,7,true", "2,8,false", "3,9,true", "4,10,false"));
-        book1.setTables(tables1);
-        assertEquals(true, book1.isAvailable(1));
-        assertEquals(false, book1.isAvailable(2));
-        assertEquals(true, book1.isAvailable(3));
-        assertEquals(false, book1.isAvailable(4));
-
-        Booking book2 = new Booking("randomemail@purdue.edu", "Password123", 8, "12:00");
-        ArrayList<String> tables2 = new ArrayList<>(Arrays.asList("1,2,false", "2,6,false", "3,6,false", "4,2,true"));
-        book2.setTables(tables2);
-        assertEquals(false, book2.isAvailable(1));
-        assertEquals(false, book2.isAvailable(2));
-        assertEquals(false, book2.isAvailable(3));
-        assertEquals(true, book2.isAvailable(4));
-    }
 }

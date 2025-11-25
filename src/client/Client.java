@@ -199,9 +199,9 @@ public class Client {
                     String response = reader.readLine();
                     JOptionPane.showMessageDialog(frame, response);
                     if (response.equals("RIGHT_CREDENTIALS")) {
-                        writer.println("RESERVE " + email + " " + password);
+                        writer.println("GET_BOOKINGS " + email + " " + password);
                         writer.flush();
-                        String bookings = reader.readLine();
+                        String bookings = reader.readLine().replace(";", "\n");
                         System.out.println("Bookings: " + bookings);
                         if (bookings == null) {
                             bookings = "Error in server";
@@ -330,7 +330,7 @@ public class Client {
      * @param password A String representing the password
      * @param bookings A String containing all the reservations
      */
-    public void reservationPage(String email, String password, String bookings) {
+    public void reservationPage(String email, String password, String bookings) throws IOException {
         panel.removeAll();
         panel.repaint();
 
@@ -392,20 +392,25 @@ public class Client {
         cancelButton.setBounds(350, 280, 150, 30);
         panel.add(cancelButton);
 
+        writer.println("GET_BOOKINGS " + email + " " + password);
+        String updated = reader.readLine().replace(";", "\n");
+        bookingsTextArea.setText(updated);
+
         reserveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String date = dateTextField.getText();
                 String time = timeTextField.getText();
+                int partySize = Integer.parseInt(partySizeTextField.getText());
 
-                writer.println("MAKE_RESERVATION " + email + " " + date + " " + time);
+                writer.println("MAKE_RESERVATION " + email + " " + password + " " + partySize + " " + date + " " + time);
 
                 try {
                     String response = reader.readLine();
                     JOptionPane.showMessageDialog(frame, response);
 
-                    writer.println("RESERVE " + email + " " + password);
-                    String updated = reader.readLine();
+                    writer.println("GET_BOOKINGS " + email + " " + password);
+                    String updated = reader.readLine().replace(";", "\n");
                     bookingsTextArea.setText(updated);
                 } catch (IOException ex) {
                     ex.printStackTrace();
@@ -417,14 +422,14 @@ public class Client {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String id = cancelTextField.getText();
-                writer.println("CANCEL_RESERVATION " + email + " " + id);
+                writer.println("CANCEL_RESERVATION " + id);
 
                 try {
                     String response = reader.readLine();
                     JOptionPane.showMessageDialog(frame, response);
 
-                    writer.println("RESERVE " + email + " " + password);
-                    String updated = reader.readLine();
+                    writer.println("GET_BOOKINGS " + email + " " + password);
+                    String updated = reader.readLine().replace(";", "\n");
                     bookingsTextArea.setText(updated);
                 } catch (IOException ex) {
                     ex.printStackTrace();

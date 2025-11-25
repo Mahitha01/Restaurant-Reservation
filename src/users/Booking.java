@@ -11,8 +11,7 @@ import java.util.ArrayList;
 public class Booking extends User implements IBooking {
     private int partySize;
     private String bookingTime;
-    private ArrayList<String> tables; //in format of #table number, #table Size, #available or not
-    private boolean isAvailable;
+    private int tableNumber;
     private int id; //unique id
     private static int nextId = 1;
     private static Object lock = new Object();
@@ -82,42 +81,5 @@ public class Booking extends User implements IBooking {
         this.bookingTime = bookingTime;
     }
 
-    /**
-     * This method sets the tables field.
-     * @param tables An arrayList containing Strings describing the tables in the restaurant.
-     * It contains the table number, table size and if its available per index of this ArrayList.
-     */
-    public void setTables(ArrayList<String> tables) {
-        this.tables = tables;
-    }
-
-    /**
-     * This method returns the tables arrayList
-     * @return tables arraylist
-     */
-    public ArrayList<String> getTables() {
-        return tables;
-    }
-
-    /**
-     * This method checks the availability of a specific table
-     * @param target An integer representing the table number wanting to be checked
-     * @return true if table is available and false if isn't
-     */
-    public boolean isAvailable(int target) { // {3,4,true}
-        if (tables == null) {
-            return false;
-        }
-
-        for (String table : tables) {
-            String[] line = table.split(",");
-            int tableNumber = Integer.parseInt(line[0]);
-            if (tableNumber == target && Boolean.parseBoolean(line[2])) {
-                return true;
-            }
-        }
-
-        return false;
-    }
 }
 

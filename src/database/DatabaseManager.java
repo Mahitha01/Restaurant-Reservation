@@ -62,6 +62,54 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
     }
 
     /**
+     * This method checks the availability of a specific table
+     * @param day A String representing the day
+     * @param target An integer representing the table number wanted
+     * @return true if table is available and false if isn't
+     */
+    public boolean isAvailable(String day, int target) { // {3,4,true}
+        synchronized(lock) {
+            ArrayList<String> tables = tablesPerDay.get(day);
+            if (tables == null) {
+                return false;
+            }
+            for (String table : tables) {
+                String[] line = table.split(",");
+                int tableNumber = Integer.parseInt(line[0]);
+                if (tableNumber == target && Boolean.parseBoolean(line[2])) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    /**
+     * This method returns all tables that can hold more that the partySize
+     * @param partySize An integer containing the number of people
+     * @return An arrayList that contains the available tables that can hold the partySize
+     */
+    public ArrayList<String> getAvailTables(String day, int partySize) {
+        synchronized(lock) {
+            ArrayList<String> result = new ArrayList<>();
+
+            ArrayList<String> tables = tablesPerDay.get(day);
+            if (tables == null) {
+                return result;
+            }
+
+            for (String table : tables) {
+                String[] data = table.split(",");
+                int tableSize = Integer.parseInt(data[1]);
+                if ((tableSize >= partySize) && Boolean.parseBoolean(data[2])) {
+                    result.add(table);
+                }
+            }
+            return result;
+        }
+    }
+
+    /**
      * This method deletes a user from the database based on their username
      * @param username A String representing the email/username of the user to be deleted
      * @return If user was successfully deleted; otherwise return false
