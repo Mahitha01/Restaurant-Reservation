@@ -352,15 +352,21 @@ public class Client {
         panel.add(timeTextField);
 
 
-
-
-
         //2
-        JButton reserveButton = new JButton("Confirm Reservation");
-        reserveButton.setBounds(20, 180, 160, 30);
-        panel.add(reserveButton);
+        JLabel partySize = new JLabel("Number of attendees:");
+        partySize.setBounds(20, 180, 200, 25);
+        panel.add(partySize);
+
+        JTextField partySizeTextField = new JTextField();
+        partySizeTextField.setBounds(20, 210, 200, 25);
+        panel.add(partySizeTextField);
 
         //3
+        JButton reserveButton = new JButton("Confirm Reservation");
+        reserveButton.setBounds(20, 240, 160, 30);
+        panel.add(reserveButton);
+
+        //4
         JLabel bookingsLabel = new JLabel("Current Bookings:");
         bookingsLabel.setBounds(350, 50, 200, 25);
         panel.add(bookingsLabel);
@@ -373,7 +379,7 @@ public class Client {
         bookingsScrollPane.setBounds(350, 80, 300, 100);
         panel.add(bookingsScrollPane);
 
-        //4
+        //5
         JLabel cancelLabel = new JLabel("Cancel Reservation(enter booking ID):");
         cancelLabel.setBounds(350, 200, 300, 25);
         panel.add(cancelLabel);
