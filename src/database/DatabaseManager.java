@@ -6,6 +6,7 @@ import database.src.users.User;
 
 import java.io.*;
 import java.util.*;
+import java.time.LocalDateTime;
 /**
  * Manages all user and booking data and uses FilePersistence.java to store these into the database.
  * Stores data temporarily and feeds it to FilePersistence.java which stores it to the database.
@@ -19,6 +20,7 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
     private final Object lock = new Object();
     private final FilePersistence storage = new FilePersistence();
     private final Map<String, ArrayList<String>> tablesPerDay = new HashMap<>();
+    private static final String TABLES_DB = "tables.db";
     /**
      * This method creates a new user with the given email and adds them
      * to the database
@@ -31,10 +33,8 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
     public boolean createUser(String email, String password) {
         synchronized (lock) {
             if (users.containsKey(email)) return false;
-
             IUser newUser = new User(email, password);
             users.put(email, newUser);
-
             return true;
         }
     }
@@ -92,7 +92,6 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
     public ArrayList<String> getAvailTables(String day, int partySize) {
         synchronized (lock) {
             ArrayList<String> result = new ArrayList<>();
-
             ArrayList<String> tables = tablesPerDay.get(day);
             if (tables == null) {
                 return result;
@@ -106,6 +105,69 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
                 }
             }
             return result;
+        }
+    }
+
+    /**
+     * Get all tables for a day
+     * @param day A String representing all tables
+     * @return
+     */
+    public ArrayList<String> getRealTimeTables(String day) {
+        synchronized(lock) {
+            return tablesPerDay.getOrDefault(day, new ArrayList<>());
+        }
+    }
+
+    /**
+     * This method allows the user to occupy a table
+     * @param day A String representing the day
+     * @param tableNum An int representing the table number
+     * @param customer A String representing the user
+     * @return
+     */
+    public boolean occupyTable(String day, int tableNum, String customer) {
+        synchronized(lock) {
+            ArrayList<String> tables = tablesPerDay.get(day);
+            if (tables == null) {
+                return false;
+            }
+            for (int i = 0; i < tables.size(); i++) {
+                String[] parts = tables.get(i).split(",");
+                int num = Integer.parseInt(parts[0]);
+                boolean available = Boolean.parseBoolean(parts[2]);
+                if (num == tableNum && available) {
+                    parts[2] = "false";
+                    parts[3] = customer;
+                    parts[4] = LocalDateTime.now().toString();
+                    tables.set(i, String.join(",", parts));
+                    saveTablesNow();
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    public boolean freeTable(String day, int tableNum) {
+        synchronized (lock) {
+            ArrayList<String> tables = tablesPerDay.get(day);
+            if (tables == null) {
+                return false;
+            }
+            for (int i = 0; i < tables.size(); i++) {
+                String[] parts = tables.get(i).split(",");
+                int num = Integer.parseInt(parts[0]);
+                if (num == tableNum) {
+                    parts[2] = "true";
+                    parts[3] = "";
+                    parts[4] = LocalDateTime.now().toString();
+                    tables.set(i, String.join(",", parts));
+                    saveTablesNow();
+                    return true;
+                }
+            }
+            return false;
         }
     }
 
@@ -188,6 +250,10 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
             return false;
         }
     }
+
+
+
+
     /**
      * This method saves the current state of users and reservations to files
      * @throws IOException thrown if an I/O error occurs
@@ -197,6 +263,7 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
         synchronized (lock) {
             storage.saveUsers(users);
             storage.saveReservations(reservations);
+            saveTables();
         }
     }
     /**
@@ -211,6 +278,35 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
             reservations.clear();
             users.putAll(storage.loadUsers());
             reservations.addAll(storage.loadReservations());
+            loadTables();
+        }
+    }
+
+    public void saveTables() throws IOException {
+        synchronized (lock) {
+            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(TABLES_DB))) {
+                oos.writeObject(tablesPerDay);
+            }
+        }
+    }
+
+    public void loadTables() throws IOException, ClassNotFoundException {
+        synchronized(lock) {
+            File f = new File(TABLES_DB);
+            if (!f.exists()) {
+                return;
+            }
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(f))) {
+                tablesPerDay.putAll((Map<String, ArrayList<String>>) ois.readObject());
+            }
+        }
+    }
+
+    public void saveTablesNow() {
+        try {
+            saveTables();;
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
     }
 }
