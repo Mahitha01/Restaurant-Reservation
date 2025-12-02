@@ -3,9 +3,11 @@ package database.src.server;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.List;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.*;
 import database.src.database.DatabaseManager;
 import database.src.users.Booking;
 import database.src.users.IBooking;
@@ -22,7 +24,7 @@ public class Server implements Runnable {
     private static int baseId = 0;
     private Socket socket;
     private static Object lock = new Object();
-
+    private Map<String, Map<String, Boolean>> tableAvailability = new HashMap<>();
     /**1
      * This constructor creates a Server object
      * When a client connects to the server, a new server object is created
@@ -32,6 +34,7 @@ public class Server implements Runnable {
      */
     public Server(Socket socket) {
         this.socket = socket;
+
     }
 
     /**
@@ -183,6 +186,27 @@ public class Server implements Runnable {
         }
     }
 
+    private List<String> Dates() {
+        List<String> dates = new ArrayList<>();
+        LocalDate start = LocalDate.now();
+        LocalDate end = start.plusMonths(3);
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        for (LocalDate d = start; !d.isAfter(end); d = d.plusDays(1)) {
+            dates.add(d.format(dtf));
+        }
+        return dates;
+    }
+
+    private List<String> Times() {
+        List<String> times = new ArrayList<>();
+        LocalTime start = LocalTime.of(10, 0);
+        LocalTime end = LocalTime.of(17, 0);
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
+        for (LocalTime t = start; !t.isAfter(end); t = t.plusMinutes(30)) {
+            times.add(t.format(dtf));
+        }
+        return times;
+    }
     /**
      * Thread that is created when a user connects
      * This allows multiple users to connect at the same time
@@ -255,6 +279,65 @@ public class Server implements Runnable {
                         break;
                     case "CANCEL_RESERVATION":
                         cancelReserve(Integer.parseInt(content[1]), writer, dm);
+                        break;
+                    case "GET_REALTIME_TABLES":
+                        if (content.length >= 2) {
+                            String date = content[1];
+
+                            List<String> tables = dm.getRealTimeTables(date);
+                            StringBuilder sb = new StringBuilder();
+                            for (int i = 0; i < tables.size(); i++) {
+                                sb.append(tables.get(i));
+                                if (i < tables.size() - 1) {
+                                    sb.append(";");
+                                }
+                            }
+                            writer.println(sb.toString());
+                        } else {
+                            writer.println("");
+                        }
+                        break;
+                    case "OCCUPY_TABLE":
+                        if (content.length >= 4) {
+                            String date = content[1];
+                            int tableNum = Integer.parseInt(content[2]);
+                            String user = content[3];
+                            boolean ok = dm.occupyTable(date, tableNum, user);
+                            if (ok) {
+                                writer.println("OCCUPY_SUCCESSFUL");
+                            } else {
+                                writer.println("OCCUPY_FAILED");
+                            }
+                        } else {
+                            writer.println("OCCUPY_FAILED");
+                        }
+                        break;
+                    case "FREE_TABLE":
+                        if (content.length >= 3) {
+                            String date = content[1];
+                            int tableNum = Integer.parseInt(content[2]);
+                            boolean ok = dm.freeTable(date, tableNum);
+                            if (ok) {
+                                writer.println("FREE_TABLE_SUCCESSFUL");
+                            } else {
+                                writer.println("FREE_TABLE_FAILED");
+                            }
+                        } else {
+                            writer.println("FREE_TABLE_FAILED");
+                        }
+                        break;
+                    case "GET_DATES":
+                        List<String> dateList = Dates();
+                        writer.println(String.join(",", dateList));
+                        writer.flush();
+                        break;
+                    case "GET_TIMES":
+                        List<String> timeList = Times();
+                        writer.println(String.join(",", timeList));
+                        writer.flush();
+                        break;
+                    default:
+                        writer.println("ERROR_UNKNOWN_COMMAND");
                         break;
                 }
                 line = reader.readLine();
