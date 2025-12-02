@@ -11,7 +11,7 @@ import java.io.*;
  * @author Shawn Shu, lab sec 02
  * @version November 23, 2025
  */
-public class Client {
+public class Client implements IClient{
     Socket socket;
     BufferedReader reader;
     PrintWriter writer;
@@ -72,7 +72,7 @@ public class Client {
     //@Override
     public void setGUI() {
         frame = new JFrame("Restaurant Reservation");
-        frame.setSize(700, 400);
+        frame.setSize(800, 600);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         panel = new JPanel();
         frame.add(panel);
@@ -120,6 +120,7 @@ public class Client {
      */
     public void goback() {
         panel.removeAll();
+        panel.revalidate();
         panel.repaint();
 
         JButton loginButton = new JButton("Login");
@@ -163,6 +164,7 @@ public class Client {
     //@Override
     public void loginPage() {
         panel.removeAll();
+        panel.revalidate();
         panel.repaint();
         JLabel emailLabel = new JLabel("Email:");
         emailLabel.setBounds(10, 20, 80, 25);
@@ -229,6 +231,7 @@ public class Client {
      */
     public void createAccountPage() {
         panel.removeAll();
+        panel.revalidate();
         panel.repaint();
         JLabel usernameLabel = new JLabel("Enter Username(email):");
         usernameLabel.setBounds(10, 20, 150, 25);
@@ -282,6 +285,7 @@ public class Client {
      */
     public void deleteAccount() {
         panel.removeAll();
+        panel.revalidate();
         panel.repaint();
         JLabel deleteAccountLabel = new JLabel("Username to delete:");
         deleteAccountLabel.setBounds(10, 20, 150, 25);
@@ -332,26 +336,39 @@ public class Client {
      */
     public void reservationPage(String email, String password, String bookings) throws IOException {
         panel.removeAll();
+        panel.revalidate();
         panel.repaint();
 
         //1
-        JLabel dateLabel = new JLabel("MM-DD-YYYY");
+        JLabel dateLabel = new JLabel("Select Dates:");
         dateLabel.setBounds(20, 50, 200, 25);
         panel.add(dateLabel);
 
-        JTextField dateTextField = new JTextField();
-        dateTextField.setBounds(20, 80, 200, 25);
-        panel.add(dateTextField);
+        JComboBox<String> dateComboBox = new JComboBox<>();
+        dateComboBox.setBounds(20, 80, 200, 25);
+        panel.add(dateComboBox);
 
-        JLabel timeLabel = new JLabel("Time");
+        writer.println("GET_DATES");
+        writer.flush();
+        String datesLists = reader.readLine();
+        for (String d: datesLists.split(",")) {
+            dateComboBox.addItem(d);
+        }
+
+        JLabel timeLabel = new JLabel("Select Time:");
         timeLabel.setBounds(20, 120, 200, 25);
         panel.add(timeLabel);
 
-        JTextField timeTextField = new JTextField();
-        timeTextField.setBounds(20, 150, 200, 25);
-        panel.add(timeTextField);
+        JComboBox timeComboBox = new JComboBox<>();
+        timeComboBox.setBounds(20, 150, 200, 25);
+        panel.add(timeComboBox);
 
-
+        writer.println("GET_TIMES");
+        writer.flush();
+        String timeLists = reader.readLine();
+        for (String t: timeLists.split(",")) {
+            timeComboBox.addItem(t);
+        }
         //2
         JLabel partySize = new JLabel("Number of attendees:");
         partySize.setBounds(20, 180, 200, 25);
@@ -367,6 +384,42 @@ public class Client {
         panel.add(reserveButton);
 
         //4
+        JButton showTablesButton = new JButton("Display Tables");
+        showTablesButton.setBounds(350, 200, 120, 25);
+        panel.add(showTablesButton);
+
+        JTextArea tablesTextArea = new JTextArea(6, 30);
+        tablesTextArea.setEditable(false);
+
+        JScrollPane tablesScrollPane = new JScrollPane(tablesTextArea);
+        tablesScrollPane.setBounds(350, 230, 350, 100);
+        panel.add(tablesScrollPane);
+
+        JLabel occupyLabel = new JLabel("Occupy Table: ");
+        occupyLabel.setBounds(20, 280, 120, 25);
+        panel.add(occupyLabel);
+
+        JTextField occupyTextField = new JTextField();
+        occupyTextField.setBounds(20, 310, 120, 25);
+        panel.add(occupyTextField);
+
+        JButton occupyButton = new JButton("Occupy Table");
+        occupyButton.setBounds(20, 340, 120, 30);
+        panel.add(occupyButton);
+
+        JLabel freeLabel = new JLabel("Free table: ");
+        freeLabel.setBounds(150, 280, 120, 25);
+        panel.add(freeLabel);
+
+        JTextField freeTextField = new JTextField();
+        freeTextField.setBounds(150, 310, 120, 25);
+        panel.add(freeTextField);
+
+        JButton freeButton = new JButton("Free Table");
+        freeButton.setBounds(150, 340, 120, 30);
+        panel.add(freeButton);
+
+        //5
         JLabel bookingsLabel = new JLabel("Current Bookings:");
         bookingsLabel.setBounds(350, 50, 200, 25);
         panel.add(bookingsLabel);
@@ -379,28 +432,113 @@ public class Client {
         bookingsScrollPane.setBounds(350, 80, 300, 100);
         panel.add(bookingsScrollPane);
 
-        //5
+        //6
         JLabel cancelLabel = new JLabel("Cancel Reservation(enter booking ID):");
-        cancelLabel.setBounds(350, 200, 300, 25);
+        cancelLabel.setBounds(350, 400, 300, 25);
         panel.add(cancelLabel);
 
         JTextField cancelTextField = new JTextField();
-        cancelTextField.setBounds(350, 250, 150, 25);
+        cancelTextField.setBounds(350, 430, 150, 25);
         panel.add(cancelTextField);
 
         JButton cancelButton = new JButton("Confirm cancellation");
-        cancelButton.setBounds(350, 280, 150, 30);
+        cancelButton.setBounds(350, 460, 150, 30);
         panel.add(cancelButton);
 
         writer.println("GET_BOOKINGS " + email + " " + password);
         String updated = reader.readLine().replace(";", "\n");
         bookingsTextArea.setText(updated);
 
+        showTablesButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String date = (String) dateComboBox.getSelectedItem();
+                if (date.isEmpty()) {
+                    JOptionPane.showConfirmDialog(frame, "Enter a date");
+                    return;
+                }
+                writer.println("GET_REALTIME_TABLES " + date);
+                writer.flush();
+                try {
+                    String response = reader.readLine();
+                    if (response == null || response.isEmpty()) {
+                        tablesTextArea.setText("No table info available for " + date);
+                    } else {
+                        String display = response.replace(";", "\n");
+                        tablesTextArea.setText(display);
+                    }
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+        occupyButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String date = (String) dateComboBox.getSelectedItem();
+                String tableStr = occupyTextField.getText().trim();
+                if (date.isEmpty() || tableStr.isEmpty()) {
+                    JOptionPane.showMessageDialog(frame, "Enter date and table number");
+                    return;
+                }
+                try {
+                    int tableNum = Integer.parseInt(tableStr);
+                    writer.println("OCCUPY_TABLE " + date + " " + tableNum + " " + email);
+                    writer.flush();
+                    String response = reader.readLine();
+                    JOptionPane.showMessageDialog(frame, response);
+                    writer.println("GET_REALTIME_TABLES " + date);
+                    writer.flush();
+                    String updated = reader.readLine();
+                    if (updated == null || updated.isEmpty()) {
+                        tablesTextArea.setText("No table info");
+                    } else {
+                        tablesTextArea.setText(updated.replace(";", "\n"));
+                    }
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+        freeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String date = (String) dateComboBox.getSelectedItem();
+                String tableStr = freeTextField.getText().trim();
+                if (date.isEmpty() || tableStr.isEmpty()) {
+                    JOptionPane.showMessageDialog(frame, "Enter date and table number");
+                    return;
+                }
+                try {
+                    int tableNum = Integer.parseInt(tableStr);
+                    writer.println("FREE_TABLE " + date + " " + tableNum);
+                    writer.flush();
+                    String response = reader.readLine();
+                    JOptionPane.showMessageDialog(frame, response);
+                    writer.println("GET_REALTIME_TABLES " + date);
+                    writer.flush();
+                    String updated  =reader.readLine();
+                    if (updated == null || updated.isEmpty()) {
+                        tablesTextArea.setText("No table info");
+                    } else {
+                        tablesTextArea.setText(updated.replace(";", "\n"));
+                    }
+
+                } catch (NumberFormatException ex) {
+                    ex.printStackTrace();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
         reserveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String date = dateTextField.getText();
-                String time = timeTextField.getText();
+                String date = (String) dateComboBox.getSelectedItem();
+                String time = (String) timeComboBox.getSelectedItem();
                 int partySize = Integer.parseInt(partySizeTextField.getText());
 
                 writer.println("MAKE_RESERVATION " + email + " " + password + " " +
