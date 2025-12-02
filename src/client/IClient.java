@@ -1,5 +1,5 @@
 package database.src.client;
-
+import java.io.IOException;
 /**
  * This interface contains methods to be implemented in the client class
  *
@@ -59,5 +59,5 @@ public interface IClient {
      * @param password A String representing the password
      * @param bookings A String containing all the reservations
      */
-    public void reservationPage(String email, String password, String bookings);
+    public void reservationPage(String email, String password, String bookings) throws IOException;
 }
