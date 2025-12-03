@@ -3,6 +3,8 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.net.*;
 import java.io.*;
+import java.time.LocalDateTime;
+import javax.swing.Timer;
 
 /**
  * This program implements the client side of a restaurant reservation page;
@@ -79,6 +81,8 @@ public class Client implements IClient{
         frame.setVisible(true);
         panel.setLayout(null);
 
+        addTime(panel);
+
         JButton loginButton = new JButton("Login");
         loginButton.setBounds(50, 30, 150, 30);
         panel.add(loginButton);
@@ -115,6 +119,20 @@ public class Client implements IClient{
     }
 
     /**
+     * This method adds real time tracking to the panel
+     * @param panel is the JPanel that is currently being shown to the user
+     */
+    public void addTime(JPanel panel) {
+        JLabel time = new JLabel("Date: " + LocalDateTime.now());
+        time.setBounds(500, 500, 160, 25);
+        panel.add(time);
+
+        Timer timer = new Timer(1000, e -> {
+            time.setText("Date: " + LocalDateTime.now());
+        });
+        timer.start();
+    }
+    /**
      * This method allows user to go back to the set GUI page
      *
      */
@@ -122,6 +140,8 @@ public class Client implements IClient{
         panel.removeAll();
         panel.revalidate();
         panel.repaint();
+
+        addTime(panel);
 
         JButton loginButton = new JButton("Login");
         loginButton.setBounds(50, 30, 150, 30);
@@ -166,6 +186,9 @@ public class Client implements IClient{
         panel.removeAll();
         panel.revalidate();
         panel.repaint();
+
+        addTime(panel);
+
         JLabel emailLabel = new JLabel("Email:");
         emailLabel.setBounds(10, 20, 80, 25);
         panel.add(emailLabel);
@@ -204,7 +227,6 @@ public class Client implements IClient{
                         writer.println("GET_BOOKINGS " + email + " " + password);
                         writer.flush();
                         String bookings = reader.readLine().replace(";", "\n");
-                        System.out.println("Bookings: " + bookings);
                         if (bookings == null) {
                             bookings = "Error in server";
                         }
@@ -233,6 +255,9 @@ public class Client implements IClient{
         panel.removeAll();
         panel.revalidate();
         panel.repaint();
+
+        addTime(panel);
+
         JLabel usernameLabel = new JLabel("Enter Username(email):");
         usernameLabel.setBounds(10, 20, 150, 25);
         panel.add(usernameLabel);
@@ -287,6 +312,9 @@ public class Client implements IClient{
         panel.removeAll();
         panel.revalidate();
         panel.repaint();
+
+        addTime(panel);
+
         JLabel deleteAccountLabel = new JLabel("Username to delete:");
         deleteAccountLabel.setBounds(10, 20, 150, 25);
         panel.add(deleteAccountLabel);
@@ -338,6 +366,19 @@ public class Client implements IClient{
         panel.removeAll();
         panel.revalidate();
         panel.repaint();
+
+        addTime(panel);
+
+        JButton menu = new JButton("Go back");
+        menu.setBounds(500, 30, 150, 30);
+        panel.add(menu);
+
+        menu.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                goback();
+            }
+        });
 
         //1
         JLabel dateLabel = new JLabel("Select Dates:");
