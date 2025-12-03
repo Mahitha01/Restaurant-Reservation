@@ -403,7 +403,7 @@ public class Client implements IClient{
         timeComboBox.setBounds(20, 150, 200, 25);
         panel.add(timeComboBox);
 
-        writer.println("GET_TIMES");
+        writer.println("GET_TIMES " + dateComboBox.getSelectedItem());
         writer.flush();
         String timeLists = reader.readLine();
         for (String t: timeLists.split(",")) {
@@ -513,6 +513,22 @@ public class Client implements IClient{
             }
         });
 
+        dateComboBox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String date = (String) dateComboBox.getSelectedItem();
+                timeComboBox.removeAllItems();
+                writer.println("GET_TIMES " + date);
+                try {
+                    String timeLists = reader.readLine();
+                    for (String t : timeLists.split(",")) {
+                        timeComboBox.addItem(t);
+                    }
+                } catch (IOException er) {
+                    er.printStackTrace();
+                }
+            }
+        });
         occupyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

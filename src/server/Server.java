@@ -196,18 +196,28 @@ public class Server implements Runnable {
         return dates;
     }
 
-    private List<String> Times() {
+    private List<String> Times(String date) {
         List<String> times = new ArrayList<>();
-        LocalTime timeNow = LocalTime.now();
-        int minute = LocalTime.now().getMinute();
-        if (minute > 30) {
-            timeNow = timeNow.plusHours(1);
-            minute = 0;
-        } else if (minute > 0) {
-            minute = 30;
+        LocalTime start;
+        LocalTime end;
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate datetday = LocalDate.now();
+        String today = datetday.format(format);
+        if (date.equals(today)) {
+            LocalTime timeNow = LocalTime.now();
+            int minute = LocalTime.now().getMinute();
+            if (minute > 30) {
+                timeNow = timeNow.plusHours(1);
+                minute = 0;
+            } else if (minute > 0) {
+                minute = 30;
+            }
+            start = LocalTime.of(timeNow.getHour(), minute);
+            end = LocalTime.of(17, 0);
+        } else {
+            start = LocalTime.of(10, 0);
+            end = LocalTime.of(17, 0);
         }
-        LocalTime start = LocalTime.of(timeNow.getHour(), minute);
-        LocalTime end = LocalTime.of(17, 0);
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
         for (LocalTime t = start; !t.isAfter(end); t = t.plusMinutes(30)) {
             times.add(t.format(dtf));
@@ -338,7 +348,7 @@ public class Server implements Runnable {
                         writer.flush();
                         break;
                     case "GET_TIMES":
-                        List<String> timeList = Times();
+                        List<String> timeList = Times(content[1]);
                         writer.println(String.join(",", timeList));
                         writer.flush();
                         break;
