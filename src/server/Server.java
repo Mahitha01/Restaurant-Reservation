@@ -150,7 +150,7 @@ public class Server implements Runnable {
      */
     public void makeReservation(String[] content, PrintWriter writer, DatabaseManager dm) {
         String dateTime = content[4] + " " + content[5];
-        IBooking booking = new Booking(content[1], content[2], Integer.parseInt(content[3]), dateTime);
+        IBooking booking = new Booking(content[1], content[2], Integer.parseInt(content[3]), dateTime, 3);
         boolean booked = dm.addReservation(content[1], booking);
         try {
             dm.save();
@@ -198,7 +198,15 @@ public class Server implements Runnable {
 
     private List<String> Times() {
         List<String> times = new ArrayList<>();
-        LocalTime start = LocalTime.of(10, 0);
+        LocalTime timeNow = LocalTime.now();
+        int minute = LocalTime.now().getMinute();
+        if (minute > 30) {
+            timeNow = timeNow.plusHours(1);
+            minute = 0;
+        } else if (minute > 0) {
+            minute = 30;
+        }
+        LocalTime start = LocalTime.of(timeNow.getHour(), minute);
         LocalTime end = LocalTime.of(17, 0);
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
         for (LocalTime t = start; !t.isAfter(end); t = t.plusMinutes(30)) {
@@ -258,14 +266,13 @@ public class Server implements Runnable {
                 }
                 String[] content = line.split(" ");
                 String action = content[0];
-                String[] userDetails = new String[0];
 
                 switch(action) {
                     case "CREATE_ACCOUNT":
-                        userDetails = createAccount(content[1], content[2], reader, writer, dm);
+                        createAccount(content[1], content[2], reader, writer, dm);
                         break;
                     case "LOGIN":
-                        userDetails = login(content[1], content[2], reader, writer, dm);
+                        login(content[1], content[2], reader, writer, dm);
                         break;
                     case "DELETE_ACCOUNT":
                         deleteAccount(content[1], reader, writer, dm);

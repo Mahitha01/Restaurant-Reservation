@@ -37,7 +37,7 @@ public class DatabaseManagerUnitTest {
         DatabaseManager dm = new DatabaseManager();
         dm.createUser("user3@gmail.com", "user3Password");
         IBooking testBooking = new Booking("user3@gmail.com", "user3Password",
-                4, "19:30");
+                4, "19:30", 4);
 
         assertTrue(dm.addReservation("user3@gmail.com", testBooking));
         assertTrue(dm.cancelReservation(testBooking.getId()));
@@ -49,7 +49,7 @@ public class DatabaseManagerUnitTest {
         DatabaseManager dm = new DatabaseManager();
         dm.createUser("user4@gmail.com", "user4Password");
         IBooking testBooking2 = new Booking("user4@gmail.com", "user4Password",
-                2, "13:30");
+                2, "13:30", 2);
 
         try {
             dm.save();

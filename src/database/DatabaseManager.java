@@ -210,8 +210,11 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
         synchronized (lock) {
             reservations.add(r);
             IUser u = users.get(username);
-            if (u != null) u.addReservation(r);
-            return true;
+            if (u != null) {
+                u.addReservation(r);
+                return true;
+            }
+            return false;
         }
     }
 

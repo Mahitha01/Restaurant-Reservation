@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class Booking extends User implements IBooking {
     private int partySize;
     private String bookingTime;
-    private int tableNumber;
+    private int tableNum;
     private int id; //unique id
     private static int nextId = 1;
     private static Object lock = new Object();
@@ -22,11 +22,13 @@ public class Booking extends User implements IBooking {
      * @param password A String representing the users password
      * @param partySize An integer containing the number of people in the reservation
      * @param bookingTime A String representing the time wanted for the booking
+     * @param tableNum An int representing the table reserved.
      */
-    public Booking(String email, String password, int partySize, String bookingTime) {
+    public Booking(String email, String password, int partySize, String bookingTime, int tableNum) {
         super(email, password);
         this.partySize = partySize;
         this.bookingTime = bookingTime;
+        this.tableNum = tableNum;
         synchronized (lock) {
             this.id = nextId++;
         }
@@ -55,6 +57,14 @@ public class Booking extends User implements IBooking {
      */
     public int getId() {
         return id;
+    }
+
+    /**
+     * This returns the booked table number
+     * @return An int representing the table number
+     */
+    public int getTableNum() {
+        return tableNum;
     }
 
     /**

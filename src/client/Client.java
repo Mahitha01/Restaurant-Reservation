@@ -81,8 +81,6 @@ public class Client implements IClient{
         frame.setVisible(true);
         panel.setLayout(null);
 
-        addTime(panel);
-
         JButton loginButton = new JButton("Login");
         loginButton.setBounds(50, 30, 150, 30);
         panel.add(loginButton);
@@ -95,6 +93,7 @@ public class Client implements IClient{
         deleteAccountButton.setBounds(450, 30, 150, 30);
         panel.add(deleteAccountButton);
 
+        addTime(panel);
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -581,6 +580,7 @@ public class Client implements IClient{
                 String date = (String) dateComboBox.getSelectedItem();
                 String time = (String) timeComboBox.getSelectedItem();
                 int partySize = Integer.parseInt(partySizeTextField.getText());
+                //int tableNum =
 
                 writer.println("MAKE_RESERVATION " + email + " " + password + " " +
                         partySize + " " + date + " " + time);

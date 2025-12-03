@@ -59,7 +59,7 @@ public class FilePersistenceTest {
 
     @Test
     public void testSaveReservations() throws IOException {
-        IBooking expectedBooking = new Booking("a@gmail.com", "hihihihi", 6, "12:30");
+        IBooking expectedBooking = new Booking("a@gmail.com", "hihihihi", 6, "12:30", 2);
         List<IBooking> expectedReservations = new ArrayList<>(Arrays.asList(expectedBooking));
         FilePersistence fp = new FilePersistence();
         fp.saveReservations(expectedReservations);
@@ -105,7 +105,7 @@ public class FilePersistenceTest {
 
     @Test
     public void testLoadReservations() throws IOException {
-        IBooking expectedBooking = new Booking("a@gmail.com", "hihihihi", 6, "12:30");
+        IBooking expectedBooking = new Booking("a@gmail.com", "hihihihi", 6, "12:30", 5);
         List<IBooking> expectedReservations = new ArrayList<>(Arrays.asList(expectedBooking));
         ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("reservations.db"));
         oos.writeObject(expectedReservations);

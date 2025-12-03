@@ -14,16 +14,17 @@ public class BookingUnitTest {
     @Test
     public void testConstructorandGetters() {
         Booking testBook = new Booking("testing@gmail.com", "testing123",
-                4, "13:30");
+                4, "13:30", 4);
         assertEquals("testing@gmail.com", testBook.getEmail());
         assertEquals("testing123", testBook.getPassword());
         assertEquals(4, testBook.getPartySize());
         assertEquals("13:30", testBook.getBookingTime());
+        assertEquals(4, testBook.getTableNum());
     }
 
     @Test
     public void testMutators() {
-        Booking b = new Booking("testing@gmail.com", "testing123", 4, "13:30");
+        Booking b = new Booking("testing@gmail.com", "testing123", 4, "13:30", 3);
         b.setPartySize(10);
         b.setBookingTime("19:30");
 

@@ -18,7 +18,7 @@ import org.junit.Test;
 public class BookingTest {
     @Test
     public void testGetters() {
-        Booking book1 = new Booking("harrypotter@yahoo.edu", "vvvvv", 4, "10:45");
+        Booking book1 = new Booking("harrypotter@yahoo.edu", "vvvvv", 4, "10:45", 3);
         String expectedEmail1 = "harrypotter@yahoo.edu";
         String expectedPassword1 = "vvvvv";
         int expectedParty1 = 4;
@@ -32,7 +32,7 @@ public class BookingTest {
         assertEquals(expectedParty1, actualParty1);
         assertEquals(expectedTime1, actualTime1);
 
-        Booking book2 = new Booking("randomemail@purdue.edu", "Password123", 8, "12:00");
+        Booking book2 = new Booking("randomemail@purdue.edu", "Password123", 8, "12:00", 1);
         String expectedEmail2 = "randomemail@purdue.edu";
         String expectedPassword2 = "Password123";
         int expectedParty2 = 8;
@@ -49,13 +49,13 @@ public class BookingTest {
 
     @Test
     public void testSetters() {
-        Booking book1 = new Booking("harrypotter@yahoo.edu", "vvvvv", 4, "10:45");
+        Booking book1 = new Booking("harrypotter@yahoo.edu", "vvvvv", 4, "10:45", 5);
         book1.setPartySize(6);
         book1.setBookingTime("18:00");
         assertEquals(6, book1.getPartySize());
         assertEquals("18:00", book1.getBookingTime());
 
-        Booking book2 = new Booking("randomemail@purdue.edu", "Password123", 8, "12:00");
+        Booking book2 = new Booking("randomemail@purdue.edu", "Password123", 8, "12:00", 7);
         book2.setPartySize(2);
         book2.setBookingTime("8:00");
         assertEquals(2, book2.getPartySize());

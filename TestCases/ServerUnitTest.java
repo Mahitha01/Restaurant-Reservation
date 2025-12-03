@@ -88,8 +88,8 @@ public class ServerUnitTest {
 
         dm.createUser("testBook@gmail.com", "testBookpass");
 
-        IBooking b1 = new Booking("testBook@gmail.com", "testBookpass", 6, "12-01-2025 13:00");
-        IBooking b2 = new Booking("testBook@gmail.com", "testBookpass", 4, "11-30-2025 18:30");
+        IBooking b1 = new Booking("testBook@gmail.com", "testBookpass", 6, "12-01-2025 13:00", 5);
+        IBooking b2 = new Booking("testBook@gmail.com", "testBookpass", 4, "11-30-2025 18:30", 4);
 
         dm.addReservation("testBook@gmail.com", b1);
         dm.addReservation("testBook@gmail.com", b2);
