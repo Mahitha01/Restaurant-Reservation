@@ -23,7 +23,7 @@ public class Server implements Runnable {
     private static int baseId = 0;
     private Socket socket;
     private static Object lock = new Object();
-    private Map<String, Map<String, Boolean>> tableAvailability = new HashMap<>();
+    //private Map<String, Map<String, Boolean>> tableAvailability = new HashMap<>();
     /**1
      * This constructor creates a Server object
      * When a client connects to the server, a new server object is created
@@ -150,7 +150,8 @@ public class Server implements Runnable {
      */
     public void makeReservation(String[] content, PrintWriter writer, DatabaseManager dm) {
         String dateTime = content[4] + " " + content[5];
-        IBooking booking = new Booking(content[1], content[2], Integer.parseInt(content[3]), dateTime, 3);
+        IBooking booking = new Booking(content[1], content[2], Integer.parseInt(content[3]),
+                dateTime, Integer.parseInt(content[6]));
         boolean booked = dm.addReservation(content[1], booking);
         try {
             dm.save();
@@ -203,7 +204,7 @@ public class Server implements Runnable {
         DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate datetday = LocalDate.now();
         String today = datetday.format(format);
-        if (date.equals(today)) {
+        if (date.equals(today) && LocalTime.now().getHour() > 10 && LocalTime.now().getHour() < 17) {
             LocalTime timeNow = LocalTime.now();
             int minute = LocalTime.now().getMinute();
             if (minute > 30) {
@@ -214,6 +215,8 @@ public class Server implements Runnable {
             }
             start = LocalTime.of(timeNow.getHour(), minute);
             end = LocalTime.of(17, 0);
+        } else if (LocalTime.now().getHour() > 17) {
+            return new ArrayList<String>();
         } else {
             start = LocalTime.of(10, 0);
             end = LocalTime.of(17, 0);
@@ -297,28 +300,24 @@ public class Server implements Runnable {
                         cancelReserve(Integer.parseInt(content[1]), writer, dm);
                         break;
                     case "GET_REALTIME_TABLES":
-                        if (content.length >= 2) {
-                            String date = content[1];
-
-                            List<String> tables = dm.getRealTimeTables(date);
-                            StringBuilder sb = new StringBuilder();
-                            for (int i = 0; i < tables.size(); i++) {
-                                sb.append(tables.get(i));
-                                if (i < tables.size() - 1) {
-                                    sb.append(";");
-                                }
+                        String date = content[1];
+                        String time = content[2];
+                        int partySize = Integer.parseInt(content[3]);
+                        List<String> tables = dm.getRealTimeTables(date, time, partySize);
+                        StringBuilder sb = new StringBuilder();
+                        for (int i = 0; i < tables.size(); i++) {
+                            sb.append(tables.get(i));
+                            if (i < tables.size() - 1) {
+                                sb.append(";");
                             }
-                            writer.println(sb.toString());
-                        } else {
-                            writer.println("");
                         }
+                        writer.println(sb.toString());
                         break;
-                    case "OCCUPY_TABLE":
+                    /*case "OCCUPY_TABLE":
                         if (content.length >= 4) {
-                            String date = content[1];
+                            String datees = content[1];
                             int tableNum = Integer.parseInt(content[2]);
-                            String user = content[3];
-                            boolean ok = dm.occupyTable(date, tableNum, user);
+                            boolean ok = dm.occupyTable(date, tableNum);
                             if (ok) {
                                 writer.println("OCCUPY_SUCCESSFUL");
                             } else {
@@ -327,8 +326,8 @@ public class Server implements Runnable {
                         } else {
                             writer.println("OCCUPY_FAILED");
                         }
-                        break;
-                    case "FREE_TABLE":
+                        break;*/
+                    /*case "FREE_TABLE":
                         if (content.length >= 3) {
                             String date = content[1];
                             int tableNum = Integer.parseInt(content[2]);
@@ -341,7 +340,7 @@ public class Server implements Runnable {
                         } else {
                             writer.println("FREE_TABLE_FAILED");
                         }
-                        break;
+                        break;*/
                     case "GET_DATES":
                         List<String> dateList = Dates();
                         writer.println(String.join(",", dateList));

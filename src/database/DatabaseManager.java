@@ -7,6 +7,7 @@ import database.src.users.User;
 import java.io.*;
 import java.util.*;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 /**
  * Manages all user and booking data and uses FilePersistence.java to store these into the database.
  * Stores data temporarily and feeds it to FilePersistence.java which stores it to the database.
@@ -19,7 +20,7 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
     private final List<IBooking> reservations = new ArrayList<>();
     private final Object lock = new Object();
     private final FilePersistence storage = new FilePersistence();
-    private final Map<String, ArrayList<String>> tablesPerDay = new HashMap<>();
+    private final Map<String, Map<String, ArrayList<String>>> tablesPerDay = new HashMap<>();
     private static final String TABLES_DB = "tables.db";
     /**
      * This method creates a new user with the given email and adds them
@@ -40,36 +41,39 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
     }
 
     /**
-     * This method adds a day with all the available tables
+     * This method adds a day and time with all the tables
      * @param date A String in the format of mm,dd,time
-     * @param tables An arraylist containing the available tables
+     * @param time A String in the format of HH:mm
      */
-    public void addDay(String date, ArrayList<String> tables) {
+    public void addDay(String date, String time) {
         synchronized (lock) {
-            tablesPerDay.put(date, tables);
+            ArrayList<String> tables = new ArrayList<>();
+            int capacity = 2;
+            for (int x = 1; x <= 20; x++) {
+                if (x % 4 == 0) {
+                    capacity += 2;
+                }
+                tables.add(x + "," + capacity + ",true");
+            }
+            if (!tablesPerDay.containsKey(date)) {
+                tablesPerDay.put(date, new HashMap<>());
+            }
+
+            tablesPerDay.get(date).put(time, tables);
         }
     }
 
-    /**
-     * This method returns the available tables for a particular day
-     * @param day A String containing the day wanted.
-     * @return An arrayList of tables available
-     */
-    public ArrayList<String> getAvailTables(String day) {
-        synchronized (lock) {
-            return tablesPerDay.get(day);
-        }
-    }
 
     /**
      * This method checks the availability of a specific table
      * @param day A String representing the day
+     * @param time A String representing the time
      * @param target An integer representing the table number wanted
      * @return true if table is available and false if isn't
      */
-    public boolean isAvailable(String day, int target) { // {3,4,true}
+    public boolean isAvailable(String day, String time, int target) { // {3,4,true}
         synchronized (lock) {
-            ArrayList<String> tables = tablesPerDay.get(day);
+            ArrayList<String> tables = tablesPerDay.get(day).get(time);
             if (tables == null) {
                 return false;
             }
@@ -86,13 +90,15 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
 
     /**
      * This method returns all tables that can hold more that the partySize
+     * @param day A String representing the day
+     * @param time A string representing the time
      * @param partySize An integer containing the number of people
      * @return An arrayList that contains the available tables that can hold the partySize
      */
-    public ArrayList<String> getAvailTables(String day, int partySize) {
+    public ArrayList<String> getAvailTables(String day, String time, int partySize) {
         synchronized (lock) {
             ArrayList<String> result = new ArrayList<>();
-            ArrayList<String> tables = tablesPerDay.get(day);
+            ArrayList<String> tables = tablesPerDay.get(day).get(time);
             if (tables == null) {
                 return result;
             }
@@ -101,7 +107,7 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
                 String[] data = table.split(",");
                 int tableSize = Integer.parseInt(data[1]);
                 if ((tableSize >= partySize) && Boolean.parseBoolean(data[2])) {
-                    result.add(table);
+                    result.add(data[0] + "," + data[1]);
                 }
             }
             return result;
@@ -109,26 +115,40 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
     }
 
     /**
-     * Get all tables for a day
-     * @param day A String representing all tables
-     * @return
+     * Get all tables for a day and time
+     * @param day A String representing the day
+     * @param time A String representing the time
+     * @param partySize A String representing the partySize
+     * @return all tables available at that particular day and time
      */
-    public ArrayList<String> getRealTimeTables(String day) {
+    public ArrayList<String> getRealTimeTables(String day, String time, int partySize) {
         synchronized(lock) {
-            return tablesPerDay.getOrDefault(day, new ArrayList<>());
+            if (!tablesPerDay.containsKey(day)) {
+                tablesPerDay.put(day, new HashMap<>());
+            }
+            if (!(tablesPerDay.get(day).containsKey(time))) {
+                addDay(day, time);
+            }
+
+            ArrayList<String> tables = tablesPerDay.get(day).get(time);
+            if (tables == null) {
+                return new ArrayList<>();
+            }
+
+            return getAvailTables(day, time, partySize);
         }
     }
 
     /**
      * This method allows the user to occupy a table
      * @param day A String representing the day
+     * @param time A String representing the time
      * @param tableNum An int representing the table number
-     * @param customer A String representing the user
-     * @return
+     * @return true of the table is occupied
      */
-    public boolean occupyTable(String day, int tableNum, String customer) {
+    public boolean occupyTable(String day, String time, int tableNum) {
         synchronized(lock) {
-            ArrayList<String> tables = tablesPerDay.get(day);
+            ArrayList<String> tables = tablesPerDay.get(day).get(time);
             if (tables == null) {
                 return false;
             }
@@ -138,8 +158,6 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
                 boolean available = Boolean.parseBoolean(parts[2]);
                 if (num == tableNum && available) {
                     parts[2] = "false";
-                    parts[3] = customer;
-                    parts[4] = LocalDateTime.now().toString();
                     tables.set(i, String.join(",", parts));
                     saveTablesNow();
                     return true;
@@ -149,9 +167,9 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
         }
     }
 
-    public boolean freeTable(String day, int tableNum) {
+    public boolean freeTable(String day, String time, int tableNum) {
         synchronized (lock) {
-            ArrayList<String> tables = tablesPerDay.get(day);
+            ArrayList<String> tables = tablesPerDay.get(day).get(time);
             if (tables == null) {
                 return false;
             }
@@ -160,8 +178,6 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
                 int num = Integer.parseInt(parts[0]);
                 if (num == tableNum) {
                     parts[2] = "true";
-                    parts[3] = "";
-                    parts[4] = LocalDateTime.now().toString();
                     tables.set(i, String.join(",", parts));
                     saveTablesNow();
                     return true;
@@ -244,6 +260,13 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
             for (int i = 0; i < reservations.size(); i++) {
                 IBooking res = reservations.get(i);
                 if (res.getId() == reservationId) {
+
+                    String bookingTime = res.getBookingTime();
+                    String[] parts = bookingTime.split(" ");
+                    String date = parts[0];
+                    String time = parts[1];
+                    freeTable(date, time, res.getTableNum());
+
                     reservations.remove(i);
                     IUser u = users.get(res.getUserEmail());
                     if (u != null) u.cancelReservation(reservationId);
@@ -300,7 +323,7 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
                 return;
             }
             try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(f))) {
-                tablesPerDay.putAll((Map<String, ArrayList<String>>) ois.readObject());
+                tablesPerDay.putAll((Map<String, Map<String, ArrayList<String>>>) ois.readObject());
             }
         }
     }

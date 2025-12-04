@@ -31,6 +31,11 @@ public interface IBooking extends java.io.Serializable {
     String getBookingTime();
 
     /**
+     * This method return the table number of the booking
+     * @return An int representing the table number booked
+     */
+    int getTableNum();
+    /**
      * This method sets the partySize field
      * @param size An integer containing the number of people in the reservation
      */

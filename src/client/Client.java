@@ -48,7 +48,6 @@ public class Client implements IClient{
     }
     /**
      * This method disconnects the client with the server
-     *
      */
     //@Override
     public void disconnect() {
@@ -420,30 +419,44 @@ public class Client implements IClient{
 
         //3
         JButton reserveButton = new JButton("Confirm Reservation");
-        reserveButton.setBounds(20, 240, 160, 30);
+        reserveButton.setBounds(20, 310, 160, 30);
         panel.add(reserveButton);
 
         //4
-        JButton showTablesButton = new JButton("Display Tables");
-        showTablesButton.setBounds(350, 200, 120, 25);
-        panel.add(showTablesButton);
+        JLabel showTables = new JLabel("Display Tables");
+        showTables.setBounds(350, 200, 120, 25);
+        panel.add(showTables);
 
-        JTextArea tablesTextArea = new JTextArea(6, 30);
+        JTextArea tablesTextArea = new JTextArea(5, 30);
         tablesTextArea.setEditable(false);
 
         JScrollPane tablesScrollPane = new JScrollPane(tablesTextArea);
         tablesScrollPane.setBounds(350, 230, 350, 100);
         panel.add(tablesScrollPane);
 
-        JLabel occupyLabel = new JLabel("Occupy Table: ");
-        occupyLabel.setBounds(20, 280, 120, 25);
-        panel.add(occupyLabel);
+        JLabel tablesLabel = new JLabel("Tables Available: ");
+        tablesLabel.setBounds(20, 240, 120, 25);
+        panel.add(tablesLabel);
 
-        JTextField occupyTextField = new JTextField();
-        occupyTextField.setBounds(20, 310, 120, 25);
-        panel.add(occupyTextField);
+        JComboBox<String> tableComboBox = new JComboBox<>();
+        tableComboBox.setBounds(20, 270, 120, 25);
+        panel.add(tableComboBox);
 
-        JButton occupyButton = new JButton("Occupy Table");
+        String people;
+        if (partySizeTextField.getText().trim().isEmpty()) {
+            people = "0";
+        } else {
+            people = partySizeTextField.getText();
+        }
+        writer.println("GET_REALTIME_TABLES " + dateComboBox.getSelectedItem() + " " +
+                timeComboBox.getSelectedItem() + " " + people);
+        writer.flush();
+        String tableLists = reader.readLine();
+        for (String t : tableLists.split(";")) {
+            tableComboBox.addItem(t.split(",")[0]);
+        }
+
+        /*JButton occupyButton = new JButton("Book Table");
         occupyButton.setBounds(20, 340, 120, 30);
         panel.add(occupyButton);
 
@@ -457,7 +470,7 @@ public class Client implements IClient{
 
         JButton freeButton = new JButton("Free Table");
         freeButton.setBounds(150, 340, 120, 30);
-        panel.add(freeButton);
+        panel.add(freeButton);*/
 
         //5
         JLabel bookingsLabel = new JLabel("Current Bookings:");
@@ -489,7 +502,7 @@ public class Client implements IClient{
         String updated = reader.readLine().replace(";", "\n");
         bookingsTextArea.setText(updated);
 
-        showTablesButton.addActionListener(new ActionListener() {
+        /*showTablesButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String date = (String) dateComboBox.getSelectedItem();
@@ -511,7 +524,24 @@ public class Client implements IClient{
                     ex.printStackTrace();
                 }
             }
-        });
+        });*/
+
+        if (partySizeTextField.getText().trim().isEmpty()) {
+            people = "0";
+        } else {
+            people = partySizeTextField.getText();
+        }
+        writer.println("GET_REALTIME_TABLES " + dateComboBox.getSelectedItem() + " " +
+                timeComboBox.getSelectedItem() + " " + people);
+        writer.flush();
+        String response = reader.readLine();
+        if (response == null || response.isEmpty()) {
+            tablesTextArea.setText("No table info available for " + dateComboBox.getSelectedItem());
+        } else {
+            String display = response.replace(";", "\n");
+            tablesTextArea.setText(display);
+        }
+
 
         dateComboBox.addActionListener(new ActionListener() {
             @Override
@@ -527,9 +557,29 @@ public class Client implements IClient{
                 } catch (IOException er) {
                     er.printStackTrace();
                 }
+                String people;
+                if (partySizeTextField.getText().trim().isEmpty()) {
+                    people = "0";
+                } else {
+                    people = partySizeTextField.getText();
+                }
+                writer.println("GET_REALTIME_TABLES " + dateComboBox.getSelectedItem() + " " +
+                        timeComboBox.getSelectedItem() + " " + people);
+                writer.flush();
+                try {
+                    String response = reader.readLine();
+                    if (response == null || response.isEmpty()) {
+                        tablesTextArea.setText("No table info available for " + dateComboBox.getSelectedItem());
+                    } else {
+                        String display = response.replace(";", "\n");
+                        tablesTextArea.setText(display);
+                    }
+                } catch (IOException er) {
+                    er.printStackTrace();
+                }
             }
         });
-        occupyButton.addActionListener(new ActionListener() {
+        /*occupyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String date = (String) dateComboBox.getSelectedItem();
@@ -588,18 +638,24 @@ public class Client implements IClient{
                     ex.printStackTrace();
                 }
             }
-        });
+        });*/
 
         reserveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String date = (String) dateComboBox.getSelectedItem();
                 String time = (String) timeComboBox.getSelectedItem();
+                if (partySizeTextField.getText().isEmpty()) {
+                    JOptionPane.showMessageDialog(frame, "Make sure to enter the number of attendees and table number!",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                int tableNum = (int) tableComboBox.getSelectedItem();
                 int partySize = Integer.parseInt(partySizeTextField.getText());
-                //int tableNum =
+
 
                 writer.println("MAKE_RESERVATION " + email + " " + password + " " +
-                        partySize + " " + date + " " + time);
+                        partySize + " " + date + " " + time + " " + tableNum);
 
                 try {
                     String response = reader.readLine();

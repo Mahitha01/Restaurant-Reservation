@@ -27,26 +27,28 @@ public interface IDatabaseManager {
     /**
      * This method adds a day with all the available tables
      * @param date A String in the format of mm,dd,time
-     * @param tables An arraylist containing the available tables
+     * @param time A String in the format of HH:mm
      */
-    void addDay(String date, ArrayList<String> tables);
+    void addDay(String date, String time);
 
     /**
-     * This method returns the available tables for a particular day that can hold the number of people attending.
-     * @param day A String containing the day wanted.
-     * @param partySize An int holding the amount of people attending
+     * This method returns all tables that can hold more that the partySize
+     * @param day A String representing the day
+     * @param time A string representing the time
+     * @param partySize An integer containing the number of people
      * @return An arrayList that contains the available tables that can hold the partySize
      */
-    ArrayList<String> getAvailTables(String day, int partySize);
+    ArrayList<String> getAvailTables(String day, String time, int partySize);
 
 
     /**
      * This method checks the availability of a specific table
      * @param day A String representing the day
+     * @param time A String representing the time
      * @param target An integer representing the table number wanted
      * @return true if table is available and false if isn't
      */
-    boolean isAvailable(String day, int target);
+    boolean isAvailable(String day, String time, int target);
 
     /**
      * This method deletes a user from the database based on their username
