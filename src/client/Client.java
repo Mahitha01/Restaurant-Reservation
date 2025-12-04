@@ -650,7 +650,7 @@ public class Client implements IClient{
                             "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                int tableNum = (int) tableComboBox.getSelectedItem();
+                int tableNum = Integer.parseInt((String) tableComboBox.getSelectedItem());
                 int partySize = Integer.parseInt(partySizeTextField.getText());
 
 
