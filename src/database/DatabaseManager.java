@@ -167,6 +167,14 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
         }
     }
 
+    /**
+     * This method frees a table from a reservation, changes the availability of the table back to true
+     * for the particular day and time
+     * @param day A String representing the day
+     * @param time A String representing the time slot booked for
+     * @param tableNum The table number booked or trying to be freed
+     * @return Returns true if successfully freed the table
+     */
     public boolean freeTable(String day, String time, int tableNum) {
         synchronized (lock) {
             ArrayList<String> tables = tablesPerDay.get(day).get(time);

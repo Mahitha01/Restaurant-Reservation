@@ -186,6 +186,10 @@ public class Server implements Runnable {
         }
     }
 
+    /**
+     * This method creates a list of dates for the next 3 months for the drop-down, which the user can choose from
+     * @return A String arraylist containing the dates for the next 3 months.
+     */
     private List<String> Dates() {
         List<String> dates = new ArrayList<>();
         LocalDate start = LocalDate.now();
@@ -197,6 +201,11 @@ public class Server implements Runnable {
         return dates;
     }
 
+    /**
+     * This method creates a list of time slots for reservation for a particular day
+     * @param date A String representing a particular day
+     * @return An arrayList of time slots
+     */
     private List<String> Times(String date) {
         List<String> times = new ArrayList<>();
         LocalTime start;

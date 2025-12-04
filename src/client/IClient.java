@@ -1,4 +1,5 @@
 package database.src.client;
+import javax.swing.*;
 import java.io.IOException;
 /**
  * This interface contains methods to be implemented in the client class
@@ -24,6 +25,12 @@ public interface IClient {
      *
      */
     public void setGUI();
+
+    /**
+     * This method adds real time tracking to the panel
+     * @param panel is the JPanel that is currently being shown to the user
+     */
+    void addTime(JPanel panel);
 
     /**
      * This method allows user to go back to the set GUI page

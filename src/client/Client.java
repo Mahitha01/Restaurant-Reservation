@@ -367,7 +367,7 @@ public class Client implements IClient{
 
         addTime(panel);
 
-        JButton menu = new JButton("Go back");
+        JButton menu = new JButton("Logout");
         menu.setBounds(500, 30, 150, 30);
         panel.add(menu);
 
