@@ -50,10 +50,10 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
             ArrayList<String> tables = new ArrayList<>();
             int capacity = 2;
             for (int x = 1; x <= 20; x++) {
+                tables.add(x + "," + capacity + ",true");
                 if (x % 4 == 0) {
                     capacity += 2;
                 }
-                tables.add(x + "," + capacity + ",true");
             }
             if (!tablesPerDay.containsKey(date)) {
                 tablesPerDay.put(date, new HashMap<>());
@@ -99,9 +99,6 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
         synchronized (lock) {
             ArrayList<String> result = new ArrayList<>();
             ArrayList<String> tables = tablesPerDay.get(day).get(time);
-            if (tables == null) {
-                return result;
-            }
 
             for (String table : tables) {
                 String[] data = table.split(",");

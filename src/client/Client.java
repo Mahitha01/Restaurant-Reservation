@@ -289,6 +289,13 @@ public class Client implements IClient{
                 try {
                     String response = reader.readLine();
                     JOptionPane.showMessageDialog(frame, response);
+                    writer.println("GET_BOOKINGS " + username + " " + newPassword);
+                    writer.flush();
+                    String bookings = reader.readLine().replace(";", "\n");
+                    if (bookings == null) {
+                        bookings = "Error in server";
+                    }
+                    reservationPage(username, newPassword, bookings);
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
@@ -538,7 +545,12 @@ public class Client implements IClient{
         if (response == null || response.isEmpty()) {
             tablesTextArea.setText("No table info available for " + dateComboBox.getSelectedItem());
         } else {
-            String display = response.replace(";", "\n");
+            String[] tables = response.split(";");
+            for (int x = 0; x < tables.length; x++) {
+                String[] components = tables[x].split(",");
+                tables[x] = "Table Number: " + components[0] + ", Capacity: " + components[1];
+            }
+            String display = String.join("\n", tables);
             tablesTextArea.setText(display);
         }
 
@@ -549,29 +561,31 @@ public class Client implements IClient{
                 String date = (String) dateComboBox.getSelectedItem();
                 timeComboBox.removeAllItems();
                 writer.println("GET_TIMES " + date);
+                writer.flush();
                 try {
                     String timeLists = reader.readLine();
                     for (String t : timeLists.split(",")) {
                         timeComboBox.addItem(t);
                     }
-                } catch (IOException er) {
-                    er.printStackTrace();
-                }
-                String people;
-                if (partySizeTextField.getText().trim().isEmpty()) {
-                    people = "0";
-                } else {
-                    people = partySizeTextField.getText();
-                }
-                writer.println("GET_REALTIME_TABLES " + dateComboBox.getSelectedItem() + " " +
-                        timeComboBox.getSelectedItem() + " " + people);
-                writer.flush();
-                try {
+                    String people;
+                    if (partySizeTextField.getText().trim().isEmpty()) {
+                        people = "0";
+                    } else {
+                        people = partySizeTextField.getText();
+                    }
+                    writer.println("GET_REALTIME_TABLES " + dateComboBox.getSelectedItem() + " " +
+                            timeComboBox.getSelectedItem() + " " + people);
+                    writer.flush();
                     String response = reader.readLine();
                     if (response == null || response.isEmpty()) {
                         tablesTextArea.setText("No table info available for " + dateComboBox.getSelectedItem());
                     } else {
-                        String display = response.replace(";", "\n");
+                        String[] tables = response.split(";");
+                        for (int x = 0; x < tables.length; x++) {
+                            String[] components = tables[x].split(",");
+                            tables[x] = "Table Number: " + components[0] + ", Capacity: " + components[1];
+                        }
+                        String display = String.join("\n", tables);
                         tablesTextArea.setText(display);
                     }
                 } catch (IOException er) {

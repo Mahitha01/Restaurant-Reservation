@@ -135,8 +135,8 @@ public class Server implements Runnable {
         List<IBooking> books = dm.getUserBookings(email);
         String bookings = "";
         for (IBooking b : books) {
-            bookings += "PartySize: " + b.getPartySize() +
-                    ", Time: " + b.getBookingTime() + ", ID: " + b.getId() + ";";
+            bookings += "PartySize: " + b.getPartySize() + ", Time: " + b.getBookingTime() +
+                    ", ID: " + b.getId() + " Booked Table: " + b.getTableNum() + ";";
         }
         writer.println(bookings);
         return bookings;
@@ -213,8 +213,11 @@ public class Server implements Runnable {
         DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate datetday = LocalDate.now();
         String today = datetday.format(format);
-        if (date.equals(today) && LocalTime.now().getHour() > 10 && LocalTime.now().getHour() < 17) {
+        if (date.equals(today) && LocalTime.now().getHour() > 10) {
             LocalTime timeNow = LocalTime.now();
+            if (LocalTime.now().getHour() > 17) {
+                return new ArrayList<String>();
+            }
             int minute = LocalTime.now().getMinute();
             if (minute > 30) {
                 timeNow = timeNow.plusHours(1);
@@ -224,8 +227,6 @@ public class Server implements Runnable {
             }
             start = LocalTime.of(timeNow.getHour(), minute);
             end = LocalTime.of(17, 0);
-        } else if (LocalTime.now().getHour() > 17) {
-            return new ArrayList<String>();
         } else {
             start = LocalTime.of(10, 0);
             end = LocalTime.of(17, 0);
@@ -335,8 +336,8 @@ public class Server implements Runnable {
                         } else {
                             writer.println("OCCUPY_FAILED");
                         }
-                        break;*/
-                    /*case "FREE_TABLE":
+                        break;
+                    case "FREE_TABLE":
                         if (content.length >= 3) {
                             String date = content[1];
                             int tableNum = Integer.parseInt(content[2]);
