@@ -10,3 +10,5 @@ This phase, we focused on the GUI aspect of our code as well as storing and upda
 
 Apart from this, we incorporated real-time tracking by making the time be dependant on the date so if the user is trying to book for the same day, we made sure not to have times that have already passed to prevent users from reserving a table in the past. We also made the tables drop-down dependant on the number of attendees, so it is easier for the user to select a table that has a capacity higher or equal to the number of attendees. Note: The "Display Tables" text area doesn't depend on number of attendees because its purpose is for the user to be able to look at all available tables at any time and date they want. 
 
+Please take note that since our project is about Reserving a table and most restaurants don't need a fee for reserving, pricing and variable pricing is not applicable to our project.
+
