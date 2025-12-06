@@ -508,6 +508,7 @@ public class Client implements IClient{
             }
             String display = String.join("\n", tables);
             tablesTextArea.setText(display);
+            tablesTextArea.setCaretPosition(0);
         }
 
 
@@ -575,6 +576,7 @@ public class Client implements IClient{
                         }
                         String display = String.join("\n", tables);
                         tablesTextArea.setText(display);
+                        tablesTextArea.setCaretPosition(0);
                     }
                 } catch (IOException er) {
                     er.printStackTrace();
@@ -619,6 +621,7 @@ public class Client implements IClient{
                         }
                         String display = String.join("\n", tables);
                         tablesTextArea.setText(display);
+                        tablesTextArea.setCaretPosition(0);
                     }
                 } catch (IOException ex) {
                     ex.printStackTrace();
@@ -653,6 +656,7 @@ public class Client implements IClient{
                         }
                         String display = String.join("\n", tables);
                         tablesTextArea.setText(display);
+                        tablesTextArea.setCaretPosition(0);
                     }
                 } catch (IOException ex) {
                     ex.printStackTrace();
