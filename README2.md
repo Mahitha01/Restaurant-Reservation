@@ -17,4 +17,4 @@ Client.java is where we implement the client. It works with the server through t
 
 Please take note that since our project is about Reserving a table and most restaurants don't need a fee for reserving, pricing and variable pricing is not applicable to our project.
 
-Things to do for phase 3: Ensure real-time tracking functions, and allows user to make a reservation up to 30 days. Make solid GUI for each of our pages. Make drop-down menus for users to select time, partySizes and table, depending on hours of operation and availability.
+Things to do for phase 3: Ensure real-time tracking functions, and allows user to make a reservation up to 90 days. Make solid GUI for each of our pages. Make drop-down menus for users to select time, partySizes and table, depending on hours of operation and availability.
