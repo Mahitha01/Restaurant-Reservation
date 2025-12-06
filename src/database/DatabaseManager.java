@@ -55,9 +55,6 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
                     capacity += 2;
                 }
             }
-            if (!tablesPerDay.containsKey(date)) {
-                tablesPerDay.put(date, new HashMap<>());
-            }
 
             tablesPerDay.get(date).put(time, tables);
         }
@@ -112,6 +109,28 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
     }
 
     /**
+     * This method returns all available tables at a particular time of a particular day
+     * @param day A String representing the date
+     * @param time A String representing the time
+     * @return An arraylist of tables numbers and capacity that are available in the format "tableNumber,capacity"
+     */
+    public ArrayList<String> getAllAvailTables(String day, String time) {
+        synchronized (lock) {
+            ArrayList<String> result = new ArrayList<>();
+            ArrayList<String> tables = tablesPerDay.get(day).get(time);
+
+            for (String table : tables) {
+                String[] data = table.split(",");
+                if (Boolean.parseBoolean(data[2])) {
+                    result.add(data[0] + "," + data[1]);
+                }
+            }
+            return result;
+        }
+    }
+
+
+    /**
      * Get all tables for a day and time
      * @param day A String representing the day
      * @param time A String representing the time
@@ -126,10 +145,8 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
             if (!(tablesPerDay.get(day).containsKey(time))) {
                 addDay(day, time);
             }
-
-            ArrayList<String> tables = tablesPerDay.get(day).get(time);
-            if (tables == null) {
-                return new ArrayList<>();
+            if (partySize == 0) {
+                return getAllAvailTables(day, time);
             }
 
             return getAvailTables(day, time, partySize);
@@ -143,11 +160,11 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
      * @param tableNum An int representing the table number
      * @return true of the table is occupied
      */
-    public boolean occupyTable(String day, String time, int tableNum) {
+    public void occupyTable(String day, String time, int tableNum) {
         synchronized(lock) {
             ArrayList<String> tables = tablesPerDay.get(day).get(time);
             if (tables == null) {
-                return false;
+                return;
             }
             for (int i = 0; i < tables.size(); i++) {
                 String[] parts = tables.get(i).split(",");
@@ -157,10 +174,9 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
                     parts[2] = "false";
                     tables.set(i, String.join(",", parts));
                     saveTablesNow();
-                    return true;
+                    return;
                 }
             }
-            return false;
         }
     }
 

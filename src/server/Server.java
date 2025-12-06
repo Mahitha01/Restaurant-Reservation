@@ -152,10 +152,10 @@ public class Server implements Runnable {
         String date = content[4];
         String time = content[5];
         String dateTime = content[4] + " " + content[5];
-        IBooking booking = new Booking(content[1], content[2], Integer.parseInt(content[3]),
-                dateTime, Integer.parseInt(content[6]));
-        boolean booked = dm.addReservation(content[1], booking);
         int tableNum = Integer.parseInt(content[6]);
+        IBooking booking = new Booking(content[1], content[2], Integer.parseInt(content[3]),
+                dateTime, tableNum);
+        boolean booked = dm.addReservation(content[1], booking);
         dm.occupyTable(date, time, tableNum);
         try {
             dm.save();
@@ -327,43 +327,13 @@ public class Server implements Runnable {
                         }
                         writer.println(sb.toString());
                         break;
-                    /*case "OCCUPY_TABLE":
-                        if (content.length >= 4) {
-                            String datees = content[1];
-                            int tableNum = Integer.parseInt(content[2]);
-                            boolean ok = dm.occupyTable(date, tableNum);
-                            if (ok) {
-                                writer.println("OCCUPY_SUCCESSFUL");
-                            } else {
-                                writer.println("OCCUPY_FAILED");
-                            }
-                        } else {
-                            writer.println("OCCUPY_FAILED");
-                        }
-                        break;
-                    case "FREE_TABLE":
-                        if (content.length >= 3) {
-                            String date = content[1];
-                            int tableNum = Integer.parseInt(content[2]);
-                            boolean ok = dm.freeTable(date, tableNum);
-                            if (ok) {
-                                writer.println("FREE_TABLE_SUCCESSFUL");
-                            } else {
-                                writer.println("FREE_TABLE_FAILED");
-                            }
-                        } else {
-                            writer.println("FREE_TABLE_FAILED");
-                        }
-                        break;*/
                     case "GET_DATES":
                         List<String> dateList = Dates();
                         writer.println(String.join(",", dateList));
-                        writer.flush();
                         break;
                     case "GET_TIMES":
                         List<String> timeList = Times(content[1]);
                         writer.println(String.join(",", timeList));
-                        writer.flush();
                         break;
                     default:
                         writer.println("ERROR_UNKNOWN_COMMAND");
