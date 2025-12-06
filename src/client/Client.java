@@ -420,9 +420,14 @@ public class Client implements IClient{
         partySize.setBounds(20, 180, 200, 25);
         panel.add(partySize);
 
-        JTextField partySizeTextField = new JTextField();
-        partySizeTextField.setBounds(20, 210, 200, 25);
-        panel.add(partySizeTextField);
+        JComboBox partySizeBox = new JComboBox<>();
+        partySizeBox.setBounds(20,210,200,25);
+
+        for (int i = 1; i <= 10; i++) {
+            partySizeBox.addItem(i);
+        }
+
+        panel.add(partySizeBox);
 
         //3
         JButton reserveButton = new JButton("Confirm Reservation");
@@ -450,11 +455,13 @@ public class Client implements IClient{
         panel.add(tableComboBox);
 
         String people;
-        if (partySizeTextField.getText().trim().isEmpty()) {
+        Integer p = (Integer) partySizeBox.getSelectedItem();
+        if (p == null) {
             people = "0";
         } else {
-            people = partySizeTextField.getText();
+            people = String.valueOf(p);
         }
+
         writer.println("GET_REALTIME_TABLES " + dateComboBox.getSelectedItem() + " " +
                 timeComboBox.getSelectedItem() + " " + people);
         writer.flush();
@@ -533,15 +540,15 @@ public class Client implements IClient{
             }
         });*/
 
-        if (partySizeTextField.getText().trim().isEmpty()) {
-            people = "0";
-        } else {
-            people = partySizeTextField.getText();
-        }
+
+        Integer p2 = (Integer) partySizeBox.getSelectedItem();
+        String people2 = (p2 == null ? "0" : String.valueOf(p2));
+
         writer.println("GET_REALTIME_TABLES " + dateComboBox.getSelectedItem() + " " +
-                timeComboBox.getSelectedItem() + " " + people);
+                timeComboBox.getSelectedItem() + " " + people2);
         writer.flush();
         String response = reader.readLine();
+
         if (response == null || response.isEmpty()) {
             tablesTextArea.setText("No table info available for " + dateComboBox.getSelectedItem());
         } else {
@@ -567,12 +574,8 @@ public class Client implements IClient{
                     for (String t : timeLists.split(",")) {
                         timeComboBox.addItem(t);
                     }
-                    String people;
-                    if (partySizeTextField.getText().trim().isEmpty()) {
-                        people = "0";
-                    } else {
-                        people = partySizeTextField.getText();
-                    }
+                    Integer ps = (Integer) partySizeBox.getSelectedItem();
+                    String people = (ps == null ? "0" : String.valueOf(ps));
                     writer.println("GET_REALTIME_TABLES " + dateComboBox.getSelectedItem() + " " +
                             timeComboBox.getSelectedItem() + " " + people);
                     writer.flush();
@@ -659,14 +662,13 @@ public class Client implements IClient{
             public void actionPerformed(ActionEvent e) {
                 String date = (String) dateComboBox.getSelectedItem();
                 String time = (String) timeComboBox.getSelectedItem();
-                if (partySizeTextField.getText().isEmpty()) {
-                    JOptionPane.showMessageDialog(frame, "Make sure to enter the number of attendees and table number!",
+                Integer partySize = (Integer) partySizeBox.getSelectedItem();
+                if (partySize == null) {
+                    JOptionPane.showMessageDialog(frame, "Please select a party size!",
                             "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 int tableNum = Integer.parseInt((String) tableComboBox.getSelectedItem());
-                int partySize = Integer.parseInt(partySizeTextField.getText());
-
 
                 writer.println("MAKE_RESERVATION " + email + " " + password + " " +
                         partySize + " " + date + " " + time + " " + tableNum);
@@ -697,6 +699,31 @@ public class Client implements IClient{
                     writer.println("GET_BOOKINGS " + email + " " + password);
                     String updated = reader.readLine().replace(";", "\n");
                     bookingsTextArea.setText(updated);
+                    Integer newPartySize = (Integer) partySizeBox.getSelectedItem();
+                    String people3 = (newPartySize == null ? "0" : String.valueOf(newPartySize));
+                    writer.println("GET_REALTIME_TABLES " + dateComboBox.getSelectedItem() + " " +
+                            timeComboBox.getSelectedItem() + " " + people3);
+                    writer.flush();
+                    String newTableList = reader.readLine();
+                    tableComboBox.removeAllItems();
+                    if (newTableList != null && !newTableList.isEmpty()) {
+                        for (String i : newTableList.split(";")) {
+                            tableComboBox.addItem(i.split(",")[0]);
+
+                        }
+                    }
+
+                    if (newTableList == null || newTableList.isEmpty()) {
+                        tablesTextArea.setText("No tables available");
+                    } else {
+                        String[] tables = newTableList.split(";");
+                        for (int x = 0; x < tables.length; x++) {
+                            String[] c = tables[x].split(",");
+                            tables[x] = "Table Number: " + c[0] + ", Capacity: " + c[1];
+                        }
+                        tablesTextArea.setText(String.join("\n", tables));
+                    }
+
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }

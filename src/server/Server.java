@@ -149,10 +149,14 @@ public class Server implements Runnable {
      * @param dm A DatabaseManager object used for adding a reservation to the database.
      */
     public void makeReservation(String[] content, PrintWriter writer, DatabaseManager dm) {
+        String date = content[4];
+        String time = content[5];
         String dateTime = content[4] + " " + content[5];
         IBooking booking = new Booking(content[1], content[2], Integer.parseInt(content[3]),
                 dateTime, Integer.parseInt(content[6]));
         boolean booked = dm.addReservation(content[1], booking);
+        int tableNum = Integer.parseInt(content[6]);
+        dm.occupyTable(date, time, tableNum);
         try {
             dm.save();
         } catch (IOException e) {
