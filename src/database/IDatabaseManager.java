@@ -4,10 +4,7 @@ import database.src.users.IBooking;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 /**
  * Interface to manage users and bookings/reservations. Implemented by DatabaseManager.java
@@ -122,23 +119,4 @@ public interface IDatabaseManager {
      * @throws ClassNotFoundException Thrown if the class of a serialized object can't be found
      */
     void load() throws IOException, ClassNotFoundException;
-
-    // --- Management features ---
-    /** Set seating arrangement for a specific day/time. */
-    void setSeatingArrangement(String day, String time, Map<Integer, Integer> tableCapacities);
-
-    /** Lock specific table numbers for a day/time. */
-    void lockTables(String day, String time, Collection<Integer> tableNumbers);
-
-    /** Unlock specific tables for a day/time. */
-    void unlockTables(String day, String time, Collection<Integer> tableNumbers);
-
-    /** Lock a section of tables inclusive [startTable, endTable] */
-    void lockSection(String day, String time, int startTable, int endTable);
-
-    /** Set operating hours for a specific day in HH:mm format. */
-    void setHours(String day, String openHHmm, String closeHHmm);
-
-    /** Get operating hours for a day if set. */
-    Optional<String[]> getHours(String day);
 }

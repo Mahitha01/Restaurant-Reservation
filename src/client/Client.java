@@ -256,24 +256,24 @@ public class Client implements IClient{
 
         addTime(panel);
 
-        JLabel usernameLabel = new JLabel("Enter Username (email):");
-        usernameLabel.setBounds(10, 20, 180, 25);
+        JLabel usernameLabel = new JLabel("Enter Username(email):");
+        usernameLabel.setBounds(10, 20, 150, 25);
         panel.add(usernameLabel);
 
-        JTextField usernameTextField = new JTextField(30);
-        usernameTextField.setBounds(200, 20, 300, 25);
+        JTextField usernameTextField = new JTextField(20);
+        usernameTextField.setBounds(150, 20, 250, 25);
         panel.add(usernameTextField);
 
         JLabel createPasswordLabel = new JLabel("Enter password:");
-        createPasswordLabel.setBounds(10, 50, 140, 25);
+        createPasswordLabel.setBounds(10, 50, 100, 25);
         panel.add(createPasswordLabel);
 
         JPasswordField createPasswordField = new JPasswordField(20);
-        createPasswordField.setBounds(200, 50, 300, 25);
+        createPasswordField.setBounds(150, 50, 250, 25);
         panel.add(createPasswordField);
 
         JButton createAccountButton = new JButton("Create Account");
-        createAccountButton.setBounds(200, 80, 160, 25);
+        createAccountButton.setBounds(150, 80, 150, 25);
         panel.add(createAccountButton);
 
         JButton menu = new JButton("Go back");
@@ -322,15 +322,15 @@ public class Client implements IClient{
         addTime(panel);
 
         JLabel deleteAccountLabel = new JLabel("Username to delete:");
-        deleteAccountLabel.setBounds(10, 20, 180, 25);
+        deleteAccountLabel.setBounds(10, 20, 150, 25);
         panel.add(deleteAccountLabel);
 
         JTextField deleteAccountTextField = new JTextField(20);
-        deleteAccountTextField.setBounds(200, 20, 300, 25);
+        deleteAccountTextField.setBounds(160, 20, 200, 25);
         panel.add(deleteAccountTextField);
 
         JButton deleteAccountButton = new JButton("Confirm Deletion");
-        deleteAccountButton.setBounds(200, 80, 200, 25);
+        deleteAccountButton.setBounds(100, 80, 150, 25);
         panel.add(deleteAccountButton);
 
         JButton menu = new JButton("Go back");
@@ -641,6 +641,14 @@ public class Client implements IClient{
                     writer.println("GET_BOOKINGS " + email + " " + password);
                     String updated = reader.readLine().replace(";", "\n");
                     bookingsTextArea.setText(updated);
+
+                    tableComboBox.removeAllItems();
+                    writer.println("GET_REALTIME_TABLES " + dateComboBox.getSelectedItem() + " " +
+                            timeComboBox.getSelectedItem() + " " + partySizeBox.getSelectedItem());
+                    String tableLists = reader.readLine();
+                    for (String t : tableLists.split(";")) {
+                        tableComboBox.addItem(t.split(",")[0]);
+                    }
 
                     writer.println("GET_REALTIME_TABLES " + dateComboBox.getSelectedItem() + " " +
                             timeComboBox.getSelectedItem() + " 0");

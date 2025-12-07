@@ -6,6 +6,7 @@ import database.src.users.User;
 
 import java.io.*;
 import java.util.*;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 /**
  * Manages all user and booking data and uses FilePersistence.java to store these into the database.
@@ -20,8 +21,6 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
     private final Object lock = new Object();
     private final FilePersistence storage = new FilePersistence();
     private final Map<String, Map<String, ArrayList<String>>> tablesPerDay = new HashMap<>();
-    private final Map<String, String[]> hoursPerDay = new HashMap<>();
-    private final Map<String, Map<String, Set<Integer>>> lockedTables = new HashMap<>();
     private static final String TABLES_DB = "tables.db";
     /**
      * This method creates a new user with the given email and adds them
@@ -48,10 +47,6 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
      */
     public void addDay(String date, String time) {
         synchronized (lock) {
-            if (!tablesPerDay.containsKey(date)) {
-                tablesPerDay.put(date, new HashMap<>());
-            }
-
             ArrayList<String> tables = new ArrayList<>();
             int capacity = 2;
             for (int x = 1; x <= 20; x++) {
@@ -75,18 +70,14 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
      */
     public boolean isAvailable(String day, String time, int target) { // {3,4,true}
         synchronized (lock) {
-            if (!isWithinHours(day, time)) return false;
-
-            Map<String, ArrayList<String>> perDay = tablesPerDay.get(day);
-            if (perDay == null) return false;
-            ArrayList<String> tables = perDay.get(time);
+            ArrayList<String> tables = tablesPerDay.get(day).get(time);
             if (tables == null) {
                 return false;
             }
             for (String table : tables) {
                 String[] line = table.split(",");
                 int tableNumber = Integer.parseInt(line[0]);
-                if (tableNumber == target && Boolean.parseBoolean(line[2]) && !isTableLocked(day, time, target)) {
+                if (tableNumber == target && Boolean.parseBoolean(line[2])) {
                     return true;
                 }
             }
@@ -104,16 +95,12 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
     public ArrayList<String> getAvailTables(String day, String time, int partySize) {
         synchronized (lock) {
             ArrayList<String> result = new ArrayList<>();
-            Map<String, ArrayList<String>> perDay = tablesPerDay.get(day);
-            if (perDay == null) return result;
-            ArrayList<String> tables = perDay.get(time);
-            if (tables == null) return result;
+            ArrayList<String> tables = tablesPerDay.get(day).get(time);
 
             for (String table : tables) {
                 String[] data = table.split(",");
                 int tableSize = Integer.parseInt(data[1]);
-                int tableNum = Integer.parseInt(data[0]);
-                if ((tableSize >= partySize) && Boolean.parseBoolean(data[2]) && !isTableLocked(day, time, tableNum)) {
+                if ((tableSize >= partySize) && Boolean.parseBoolean(data[2])) {
                     result.add(data[0] + "," + data[1]);
                 }
             }
@@ -130,15 +117,11 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
     public ArrayList<String> getAllAvailTables(String day, String time) {
         synchronized (lock) {
             ArrayList<String> result = new ArrayList<>();
-            Map<String, ArrayList<String>> perDay = tablesPerDay.get(day);
-            if (perDay == null) return result;
-            ArrayList<String> tables = perDay.get(time);
-            if (tables == null) return result;
+            ArrayList<String> tables = tablesPerDay.get(day).get(time);
 
             for (String table : tables) {
                 String[] data = table.split(",");
-                int tableNum = Integer.parseInt(data[0]);
-                if (Boolean.parseBoolean(data[2]) && !isTableLocked(day, time, tableNum)) {
+                if (Boolean.parseBoolean(data[2])) {
                     result.add(data[0] + "," + data[1]);
                 }
             }
@@ -151,10 +134,10 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
      * Get all tables for a day and time
      * @param day A String representing the day
      * @param time A String representing the time
-     * @param partySize An int representing the party size (0 returns all available tables)
+     * @param partySize A String representing the partySize
      * @return all tables available at that particular day and time
      */
-     public ArrayList<String> getRealTimeTables(String day, String time, int partySize) {
+    public ArrayList<String> getRealTimeTables(String day, String time, int partySize) {
         synchronized(lock) {
             if (!tablesPerDay.containsKey(day)) {
                 tablesPerDay.put(day, new HashMap<>());
@@ -165,7 +148,6 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
             if (partySize == 0) {
                 return getAllAvailTables(day, time);
             }
-
             return getAvailTables(day, time, partySize);
         }
     }
@@ -175,18 +157,19 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
      * @param day A String representing the day
      * @param time A String representing the time
      * @param tableNum An int representing the table number
+     * @return true of the table is occupied
      */
-     public void occupyTable(String day, String time, int tableNum) {
+    public void occupyTable(String day, String time, int tableNum) {
         synchronized(lock) {
-            if (!isWithinHours(day, time)) return;
-            if (isTableLocked(day, time, tableNum)) return;
-
-            Map<String, ArrayList<String>> perDay = tablesPerDay.get(day);
-            if (perDay == null) return;
-            ArrayList<String> tables = perDay.get(time);
-            if (tables == null) {
-                return;
+            if (!tablesPerDay.containsKey(day)) {
+                tablesPerDay.put(day, new HashMap<>());
             }
+            if (!(tablesPerDay.get(day).containsKey(time))) {
+                addDay(day, time);
+            }
+
+            ArrayList<String> tables = tablesPerDay.get(day).get(time);
+
             for (int i = 0; i < tables.size(); i++) {
                 String[] parts = tables.get(i).split(",");
                 int num = Integer.parseInt(parts[0]);
@@ -211,9 +194,7 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
      */
     public boolean freeTable(String day, String time, int tableNum) {
         synchronized (lock) {
-            Map<String, ArrayList<String>> perDay = tablesPerDay.get(day);
-            if (perDay == null) return false;
-            ArrayList<String> tables = perDay.get(time);
+            ArrayList<String> tables = tablesPerDay.get(day).get(time);
             if (tables == null) {
                 return false;
             }
@@ -228,155 +209,6 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
                 }
             }
             return false;
-        }
-    }
-
-    /**
-     * Set seating arrangement for a specific day/time. If tableCapacities is empty or null,
-     * the default layout (20 tables with increasing capacity every 4 tables) is used.
-     *
-     * @param day the date string identifying the day
-     * @param time the time slot (HH:mm)
-     * @param tableCapacities a map from table number to capacity; if null or empty default layout is applied
-     */
-    public void setSeatingArrangement(String day, String time, Map<Integer, Integer> tableCapacities) {
-        synchronized (lock) {
-            if (!tablesPerDay.containsKey(day)) tablesPerDay.put(day, new HashMap<>());
-
-            ArrayList<String> tables = new ArrayList<>();
-            int maxTable = 20;
-            if (tableCapacities != null && !tableCapacities.isEmpty()) {
-                for (Integer k : tableCapacities.keySet()) if (k != null && k > maxTable) maxTable = k;
-            }
-
-            for (int x = 1; x <= maxTable; x++) {
-                int capacity;
-                if (tableCapacities != null && tableCapacities.containsKey(x)) {
-                    capacity = tableCapacities.get(x);
-                } else {
-                    int baseGroup = (x - 1) / 4;
-                    capacity = 2 + baseGroup * 2;
-                }
-                tables.add(x + "," + capacity + ",true");
-            }
-
-            tablesPerDay.get(day).put(time, tables);
-            saveTablesNow();
-        }
-    }
-
-    /**
-     * Lock specific table numbers for a day/time.
-     *
-     * @param day the date string identifying the day
-     * @param time the time slot (HH:mm) for which to lock tables
-     * @param tableNumbers a collection of table numbers to lock
-     */
-    public void lockTables(String day, String time, Collection<Integer> tableNumbers) {
-        synchronized (lock) {
-            lockedTables.computeIfAbsent(day, k -> new HashMap<>())
-                    .computeIfAbsent(time, k -> new HashSet<>())
-                    .addAll(tableNumbers);
-            saveTablesNow();
-        }
-    }
-
-    /**
-     * Unlock specific tables for a day/time.
-     *
-     * @param day the date string identifying the day
-     * @param time the time slot (HH:mm) for which to unlock tables
-     * @param tableNumbers a collection of table numbers to unlock
-     */
-    public void unlockTables(String day, String time, Collection<Integer> tableNumbers) {
-        synchronized (lock) {
-            Map<String, Set<Integer>> perDay = lockedTables.get(day);
-            if (perDay == null) return;
-            Set<Integer> set = perDay.get(time);
-            if (set == null) return;
-            set.removeAll(tableNumbers);
-            if (set.isEmpty()) perDay.remove(time);
-            if (perDay.isEmpty()) lockedTables.remove(day);
-            saveTablesNow();
-        }
-    }
-
-    /**
-     * Lock a section of tables inclusive [startTable, endTable].
-     *
-     * @param day the date string identifying the day
-     * @param time the time slot (HH:mm) for which to lock the section
-     * @param startTable the starting table number (inclusive)
-     * @param endTable the ending table number (inclusive)
-     */
-    public void lockSection(String day, String time, int startTable, int endTable) {
-        synchronized (lock) {
-            if (startTable > endTable) {
-                int tmp = startTable; startTable = endTable; endTable = tmp;
-            }
-            Set<Integer> toLock = new HashSet<>();
-            for (int i = startTable; i <= endTable; i++) toLock.add(i);
-            lockTables(day, time, toLock);
-        }
-    }
-
-    private boolean isTableLocked(String day, String time, int tableNum) {
-        Map<String, Set<Integer>> perDay = lockedTables.get(day);
-        if (perDay == null) return false;
-        Set<Integer> s = perDay.get(time);
-        return s != null && s.contains(tableNum);
-    }
-
-    /**
-     * Set operating hours for a specific day. Times should be in HH:mm format.
-     *
-     * @param day the date string identifying the day
-     * @param openHHmm opening time in HH:mm format
-     * @param closeHHmm closing time in HH:mm format
-     */
-    public void setHours(String day, String openHHmm, String closeHHmm) {
-        synchronized (lock) {
-            hoursPerDay.put(day, new String[]{openHHmm, closeHHmm});
-            saveTablesNow();
-        }
-    }
-
-    /**
-     * Get the operating hours for a specific day.
-     *
-     * @param day the date string identifying the day
-     * @return an Optional containing a String[2] with open and close times (HH:mm), or empty if not set
-     */
-    public Optional<String[]> getHours(String day) {
-        synchronized (lock) {
-            return Optional.ofNullable(hoursPerDay.get(day));
-        }
-    }
-
-    /**
-     * Check whether a given time is within the configured operating hours for a day.
-     * If no hours are configured for the day, this returns true.
-     *
-     * @param day the date string identifying the day
-     * @param timeStr the time to check (HH:mm)
-     * @return true if the time is within hours or hours are not configured; false otherwise
-     */
-    private boolean isWithinHours(String day, String timeStr) {
-        synchronized (lock) {
-            String[] hours = hoursPerDay.get(day);
-            if (hours == null) return true;
-            try {
-                LocalTime t = LocalTime.parse(timeStr);
-                LocalTime open = LocalTime.parse(hours[0]);
-                LocalTime close = LocalTime.parse(hours[1]);
-                if (close.isBefore(open)) {
-                    return !t.isBefore(open) || !t.isAfter(close);
-                } else {
-                    return !t.isBefore(open) && !t.isAfter(close);
-                }
-            } catch (Exception ex) {
-                return true;
-            }
         }
     }
 
@@ -501,29 +333,14 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
         }
     }
 
-    /**
-     * Save the tables/hours/locks state to the tables DB file.
-     *
-     * @throws IOException if an I/O error occurs while writing the file
-     */
     public void saveTables() throws IOException {
         synchronized (lock) {
-            TablesState st = new TablesState();
-            st.tablesPerDay = this.tablesPerDay;
-            st.hoursPerDay = this.hoursPerDay;
-            st.lockedTables = this.lockedTables;
             try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(TABLES_DB))) {
-                oos.writeObject(st);
+                oos.writeObject(tablesPerDay);
             }
         }
     }
 
-    /**
-     * Load the tables/hours/locks state from the tables DB file if it exists.
-     *
-     * @throws IOException if an I/O error occurs while reading the file
-     * @throws ClassNotFoundException if a serialized class cannot be found
-     */
     public void loadTables() throws IOException, ClassNotFoundException {
         synchronized(lock) {
             File f = new File(TABLES_DB);
@@ -531,36 +348,16 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
                 return;
             }
             try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(f))) {
-                Object obj = ois.readObject();
-                if (obj instanceof TablesState) {
-                    TablesState st = (TablesState) obj;
-                    this.tablesPerDay.clear();
-                    this.tablesPerDay.putAll(st.tablesPerDay != null ? st.tablesPerDay : new HashMap<>());
-                    this.hoursPerDay.clear();
-                    this.hoursPerDay.putAll(st.hoursPerDay != null ? st.hoursPerDay : new HashMap<>());
-                    this.lockedTables.clear();
-                    this.lockedTables.putAll(st.lockedTables != null ? st.lockedTables : new HashMap<>());
-                } else if (obj instanceof Map) {
-                    this.tablesPerDay.clear();
-                    this.tablesPerDay.putAll((Map<String, Map<String, ArrayList<String>>>) obj);
-                }
+                tablesPerDay.putAll((Map<String, Map<String, ArrayList<String>>>) ois.readObject());
             }
         }
     }
 
     public void saveTablesNow() {
         try {
-            saveTables();
+            saveTables();;
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-    }
-
-    /** Serializable container for tables + hours + locks. */
-    private static class TablesState implements Serializable {
-        private static final long serialVersionUID = 1L;
-        public Map<String, Map<String, ArrayList<String>>> tablesPerDay;
-        public Map<String, String[]> hoursPerDay;
-        public Map<String, Map<String, Set<Integer>>> lockedTables;
     }
 }
