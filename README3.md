@@ -10,7 +10,7 @@ This phase, we focused on the GUI aspect of our code as well as storing and upda
 
 Apart from this, we incorporated real-time tracking by making the time be dependant on the date so if the user is trying to book for the same day, we made sure not to have times that have already passed to prevent users from reserving a table in the past. We also made the tables drop-down dependant on the number of attendees, so it is easier for the user to select a table that has a capacity higher or equal to the number of attendees. Note: The "Display Tables" text area doesn't depend on number of attendees because its purpose is for the user to be able to look at all available tables at any time and date they want. 
 
-Our restaurant currently has 20 tables with capacities 2, 4, 6, 8 and 10. There are 4 tables per capacity. Along with this, we made the maximum limit of the number of attendees to be 10 since there's no limit on the number of bookings a user can make.
+Our restaurant currently has 20 tables with capacities 2, 4, 6, 8 and 10. There are 4 tables per capacity. Along with this, we made the maximum limit of the number of attendees to be 10 since there's no limit on the number of bookings a user can make. The tables display always shows the user all available tables at the time and date they selected which get updated immediately after reserving or cancelling a reservation.
 
 Please take note that since our project is about Reserving a table and most restaurants don't need a fee for reserving, pricing and variable pricing is not applicable to our project.
 
