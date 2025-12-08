@@ -66,11 +66,15 @@ public class ServerUnitTest {
         Server server = new Server(null);
         PrintWriter pwTest = new PrintWriter(new StringWriter());
 
-        server.deleteAccount("deletedAcc", null, pwTest, dm);
+        server.deleteAccount("deletedAcc", "delete", null, pwTest, dm);
         assertFalse(dm.authenticate("deletedAcc", "delete"));
 
+        dm.createUser("testUser", "correctPass");
+        server.deleteAccount("testUser", "wrongPass", null, pwTest, dm);
+        assertTrue(dm.authenticate("testUser", "correctPass"));
+
         //tests for crashing
-        server.deleteAccount("nouser", null, pwTest, dm);
+        server.deleteAccount("nouser", "anyPass", null, pwTest, dm);
         assertFalse(dm.authenticate("nouser", "anyPass"));
     }
 

@@ -446,6 +446,19 @@ public class Client implements IClient{
         deleteAccountTextField.setBorder(new EmptyBorder(4,6,4,6));
         panel.add(deleteAccountTextField);
 
+        dY += dInputH + dVSpacing;
+
+        JLabel deletePasswordLabel = new JLabel("Password:");
+        deletePasswordLabel.setBounds(dLabelX, dY + (dInputH - dLabelH)/2, dLabelW, dLabelH);
+        panel.add(deletePasswordLabel);
+
+        JPasswordField deletePasswordField = new JPasswordField(20);
+        deletePasswordField.setBounds(dInputX, dY, dInputW, dInputH);
+        deletePasswordField.setFont(inputFont);
+        deletePasswordField.setMargin(new Insets(4,4,4,4));
+        deletePasswordField.setBorder(new EmptyBorder(4,6,4,6));
+        panel.add(deletePasswordField);
+
         JButton deleteAccountButton = new JButton("Confirm Deletion");
         deleteAccountButton.setBounds(100, dY + dInputH + dVSpacing, 150, 30);
         panel.add(deleteAccountButton);
@@ -458,7 +471,8 @@ public class Client implements IClient{
             @Override
             public void actionPerformed(ActionEvent e) {
                 String deleteUsername = deleteAccountTextField.getText();
-                writer.println("DELETE_ACCOUNT " + deleteUsername);
+
+                writer.println("DELETE_ACCOUNT " + deleteUsername + " " + new String(deletePasswordField.getPassword()));
                 try {
                     String response = reader.readLine();
                     JOptionPane.showMessageDialog(frame, response);

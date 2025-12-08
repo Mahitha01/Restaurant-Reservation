@@ -215,11 +215,15 @@ public class DatabaseManager implements database.src.database.IDatabaseManager {
     /**
      * This method deletes a user from the database based on their username
      * @param username A String representing the email/username of the user to be deleted
+     * @param password A String representing the password of the user for authentication
      * @return If user was successfully deleted; otherwise return false
      */
     @Override
-    public boolean deleteUser(String username) {
+    public boolean deleteUser(String username, String password) {
         synchronized (lock) {
+            IUser u = users.get(username);
+            if (u == null) return false;
+            if (u.getPasswordHash() != password.hashCode()) return false;
             return users.remove(username) != null;
         }
     }

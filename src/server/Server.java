@@ -112,14 +112,19 @@ public class Server implements Runnable {
      * @param dm A DatabaseManager object used for deleting the user
      * @throws IOException from writing or saving in database
      */
-    public void deleteAccount(String username, BufferedReader reader, PrintWriter writer,
+    public void deleteAccount(String username, String password, BufferedReader reader, PrintWriter writer,
                               DatabaseManager dm) throws IOException {
-        if (dm.deleteUser(username)) {
-            writer.println("DELETED_SUCCESSFULLY");
-            writer.flush();
-            dm.save();
+        if (dm.authenticate(username, password)) {
+            if (dm.deleteUser(username, password)) {
+                writer.println("DELETED_SUCCESSFULLY");
+                writer.flush();
+                dm.save();
+            } else {
+                writer.println("DELETE_FAILED");
+                writer.flush();
+            }
         } else {
-            writer.println("DELETE_FAILED");
+            writer.println("INCORRECT_PASSWORD");
             writer.flush();
         }
     }
@@ -302,7 +307,7 @@ public class Server implements Runnable {
                         login(content[1], content[2], reader, writer, dm);
                         break;
                     case "DELETE_ACCOUNT":
-                        deleteAccount(content[1], reader, writer, dm);
+                        deleteAccount(content[1], content[2], reader, writer, dm);
                         break;
                     case "GET_BOOKINGS":
                         getBookings(content[1], writer, dm);

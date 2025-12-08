@@ -28,8 +28,8 @@ public class DatabaseManagerUnitTest {
     public void testDeleteUser() {
         DatabaseManager dm = new DatabaseManager();
         dm.createUser("user2@gmail.com", "user2Password");
-        assertTrue(dm.deleteUser("user2@gmail.com"));
-        assertFalse(dm.deleteUser("user2@gmail.com"));
+        assertTrue(dm.deleteUser("user2@gmail.com", "user2Password"));
+        assertFalse(dm.deleteUser("user2@gmail.com", "user2Password"));
     }
 
     @Test

@@ -72,9 +72,10 @@ public interface IDatabaseManager {
     /**
      * This method deletes a user from the database based on their username
      * @param username A String representing the email/username of the user to be deleted
+     * @param password A String representing the password of the user for authentication
      * @return If user was successfully deleted; otherwise return false
      */
-    boolean deleteUser(String username);
+    boolean deleteUser(String username, String password);
 
     /**
      * This method authenticates a user by checking their email and password
