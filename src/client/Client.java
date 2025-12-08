@@ -4,7 +4,13 @@ import java.awt.event.*;
 import java.net.*;
 import java.io.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.awt.Font;
 import javax.swing.Timer;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.Insets;
+import javax.swing.border.EmptyBorder;
 
 /**
  * This program implements the client side of a restaurant reservation page;
@@ -19,6 +25,10 @@ public class Client implements IClient{
     PrintWriter writer;
     JFrame frame;
     JPanel panel;
+    Timer dateTimer;
+    JLabel dateLabel;
+    ComponentListener frameListener;
+    Font inputFont;
 
     /**
      * This constructor initializes fields of network IO
@@ -72,27 +82,55 @@ public class Client implements IClient{
      */
     //@Override
     public void setGUI() {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception ignored) { }
+
         frame = new JFrame("Restaurant Reservation");
         frame.setSize(800, 600);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         panel = new JPanel();
         frame.add(panel);
-        frame.setVisible(true);
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                if (dateTimer != null && dateTimer.isRunning()) dateTimer.stop();
+            }
+            @Override
+            public void windowClosing(WindowEvent e) {
+                if (dateTimer != null && dateTimer.isRunning()) dateTimer.stop();
+            }
+        });
         panel.setLayout(null);
 
-        JButton loginButton = new JButton("Login");
-        loginButton.setBounds(50, 30, 150, 30);
-        panel.add(loginButton);
-
-        JButton createAccountButton = new JButton("Create Account");
-        createAccountButton.setBounds(250, 30, 150, 30);
-        panel.add(createAccountButton);
-
-        JButton deleteAccountButton = new JButton("Delete Account");
-        deleteAccountButton.setBounds(450, 30, 150, 30);
-        panel.add(deleteAccountButton);
+        Font btnFont = new Font("SansSerif", Font.BOLD, 14);
+        inputFont = new Font("SansSerif", Font.PLAIN, 15);
 
         addTime(panel);
+
+        int frameWidth = frame.getWidth();
+        int buttonWidth = 150;
+        int buttonHeight = 30;
+        int spacing = 30;
+        int totalWidth = 3 * buttonWidth + 2 * spacing;
+        int startX = (frameWidth - totalWidth) / 2;
+        int y = 30;
+
+        JButton loginButton = new JButton("Login");
+        loginButton.setBounds(startX, y, buttonWidth, buttonHeight);
+        loginButton.setFont(btnFont);
+
+        JButton createAccountButton = new JButton("Create Account");
+        createAccountButton.setBounds(startX + buttonWidth + spacing, y, buttonWidth, buttonHeight);
+        createAccountButton.setFont(btnFont);
+
+        JButton deleteAccountButton = new JButton("Delete Account");
+        deleteAccountButton.setBounds(startX + 2 * (buttonWidth + spacing), y, buttonWidth, buttonHeight);
+        deleteAccountButton.setFont(btnFont);
+        panel.add(loginButton);
+        panel.add(createAccountButton);
+        panel.add(deleteAccountButton);
+
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -114,6 +152,7 @@ public class Client implements IClient{
             }
         });
 
+        frame.setVisible(true);
     }
 
     /**
@@ -121,14 +160,52 @@ public class Client implements IClient{
      * @param panel is the JPanel that is currently being shown to the user
      */
     public void addTime(JPanel panel) {
-        JLabel time = new JLabel("Date: " + LocalDateTime.now());
-        time.setBounds(500, 500, 160, 25);
-        panel.add(time);
 
-        Timer timer = new Timer(1000, e -> {
-            time.setText("Date: " + LocalDateTime.now());
+        if (dateTimer != null && dateTimer.isRunning()) {
+            dateTimer.stop();
+        }
+
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        if (dateLabel != null) {
+            try { panel.remove(dateLabel); } catch (Exception ignored) {}
+            dateLabel = null;
+        }
+
+        int y = 10;
+        if (frame != null) {
+            y = frame.getHeight() - 50;
+        } else if (panel != null) {
+            y = panel.getHeight() - 50;
+        }
+        if (y < 10) y = 10;
+
+        dateLabel = new JLabel("Date: " + LocalDateTime.now().format(fmt));
+        dateLabel.setBounds(10, y, 300, 25);
+        dateLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
+        panel.add(dateLabel);
+
+        dateTimer = new Timer(1000, e -> {
+            if (dateLabel != null) dateLabel.setText("Date: " + LocalDateTime.now().format(fmt));
         });
-        timer.start();
+        dateTimer.start();
+
+        if (frame != null) {
+            if (frameListener != null) {
+                try { frame.removeComponentListener(frameListener); } catch (Exception ignored) {}
+                frameListener = null;
+            }
+            frameListener = new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    if (dateLabel == null) return;
+                    int newY = frame.getHeight() - 50;
+                    if (newY < 10) newY = 10;
+                    dateLabel.setBounds(10, newY, 300, 25);
+                }
+            };
+            frame.addComponentListener(frameListener);
+        }
     }
     /**
      * This method allows user to go back to the set GUI page
@@ -141,16 +218,28 @@ public class Client implements IClient{
 
         addTime(panel);
 
+        Font btnFont = new Font("SansSerif", Font.BOLD, 14);
+        int frameWidth = frame.getWidth();
+        int buttonWidth = 150;
+        int buttonHeight = 30;
+        int spacing = 30;
+        int totalWidth = 3 * buttonWidth + 2 * spacing;
+        int startX = (frameWidth - totalWidth) / 2;
+        int y = 30;
+
         JButton loginButton = new JButton("Login");
-        loginButton.setBounds(50, 30, 150, 30);
+        loginButton.setBounds(startX, y, buttonWidth, buttonHeight);
+        loginButton.setFont(btnFont);
         panel.add(loginButton);
 
         JButton createAccountButton = new JButton("Create Account");
-        createAccountButton.setBounds(250, 30, 150, 30);
+        createAccountButton.setBounds(startX + buttonWidth + spacing, y, buttonWidth, buttonHeight);
+        createAccountButton.setFont(btnFont);
         panel.add(createAccountButton);
 
         JButton deleteAccountButton = new JButton("Delete Account");
-        deleteAccountButton.setBounds(450, 30, 150, 30);
+        deleteAccountButton.setBounds(startX + 2 * (buttonWidth + spacing), y, buttonWidth, buttonHeight);
+        deleteAccountButton.setFont(btnFont);
         panel.add(deleteAccountButton);
 
         loginButton.addActionListener(new ActionListener() {
@@ -187,24 +276,36 @@ public class Client implements IClient{
 
         addTime(panel);
 
+        int labelX = 10; int labelW = 80; int labelH = 25;
+        int inputX = 100; int inputW = 165; int inputH = 40; int vSpacing = 12;
+
+        int emailY = 20;
+        int passwordY = emailY + inputH + vSpacing;
+
         JLabel emailLabel = new JLabel("Email:");
-        emailLabel.setBounds(10, 20, 80, 25);
+        emailLabel.setBounds(labelX, emailY + (inputH - labelH)/2, labelW, labelH);
         panel.add(emailLabel);
 
         JTextField emailTextField = new JTextField(20);
-        emailTextField.setBounds(100, 20, 165, 25);
+        emailTextField.setBounds(inputX, emailY, inputW, inputH);
+        emailTextField.setFont(inputFont);
+        emailTextField.setMargin(new Insets(4,4,4,4));
+        emailTextField.setBorder(new EmptyBorder(4,6,4,6));
         panel.add(emailTextField);
 
         JLabel passwordLabel = new JLabel("Password");
-        passwordLabel.setBounds(10, 50, 80, 25);
+        passwordLabel.setBounds(labelX, passwordY + (inputH - labelH)/2, labelW, labelH);
         panel.add(passwordLabel);
 
         JPasswordField passwordField = new JPasswordField(20);
-        passwordField.setBounds(100, 50, 165, 25);
+        passwordField.setBounds(inputX, passwordY, inputW, inputH);
+        passwordField.setFont(inputFont);
+        passwordField.setMargin(new Insets(4,4,4,4));
+        passwordField.setBorder(new EmptyBorder(4,6,4,6));
         panel.add(passwordField);
 
         JButton submitLoginButton = new JButton("Login");
-        submitLoginButton.setBounds(100, 80, 100, 25);
+        submitLoginButton.setBounds(inputX, passwordY + inputH + vSpacing, 100, 30);
         panel.add(submitLoginButton);
 
         JButton menu = new JButton("Go back");
@@ -221,12 +322,15 @@ public class Client implements IClient{
                 try {
                     String response = reader.readLine();
                     JOptionPane.showMessageDialog(frame, response);
-                    if (response.equals("RIGHT_CREDENTIALS")) {
+                    if ("RIGHT_CREDENTIALS".equals(response)) {
                         writer.println("GET_BOOKINGS " + email + " " + password);
                         writer.flush();
-                        String bookings = reader.readLine().replace(";", "\n");
-                        if (bookings == null) {
+                        String rawBookings = reader.readLine();
+                        String bookings;
+                        if (rawBookings == null) {
                             bookings = "Error in server";
+                        } else {
+                            bookings = rawBookings.replace(";", "\n");
                         }
                         reservationPage(email, password, bookings);
                     }
@@ -256,24 +360,36 @@ public class Client implements IClient{
 
         addTime(panel);
 
+        int uLabelX = 10; int uLabelW = 150; int uLabelH = 25;
+        int uInputX = 150; int uInputW = 250; int uInputH = 40; int uVSpacing = 12;
+
+        int userY = 20;
+        int passY = userY + uInputH + uVSpacing;
+
         JLabel usernameLabel = new JLabel("Enter Username(email):");
-        usernameLabel.setBounds(10, 20, 150, 25);
+        usernameLabel.setBounds(uLabelX, userY + (uInputH - uLabelH)/2, uLabelW, uLabelH);
         panel.add(usernameLabel);
 
         JTextField usernameTextField = new JTextField(20);
-        usernameTextField.setBounds(150, 20, 250, 25);
+        usernameTextField.setBounds(uInputX, userY, uInputW, uInputH);
+        usernameTextField.setFont(inputFont);
+        usernameTextField.setMargin(new Insets(4,4,4,4));
+        usernameTextField.setBorder(new EmptyBorder(4,6,4,6));
         panel.add(usernameTextField);
 
         JLabel createPasswordLabel = new JLabel("Enter password:");
-        createPasswordLabel.setBounds(10, 50, 100, 25);
+        createPasswordLabel.setBounds(uLabelX, passY + (uInputH - uLabelH)/2, uLabelW, uLabelH);
         panel.add(createPasswordLabel);
 
         JPasswordField createPasswordField = new JPasswordField(20);
-        createPasswordField.setBounds(150, 50, 250, 25);
+        createPasswordField.setBounds(uInputX, passY, uInputW, uInputH);
+        createPasswordField.setFont(inputFont);
+        createPasswordField.setMargin(new Insets(4,4,4,4));
+        createPasswordField.setBorder(new EmptyBorder(4,6,4,6));
         panel.add(createPasswordField);
 
         JButton createAccountButton = new JButton("Create Account");
-        createAccountButton.setBounds(150, 80, 150, 25);
+        createAccountButton.setBounds(uInputX, passY + uInputH + uVSpacing, 150, 30);
         panel.add(createAccountButton);
 
         JButton menu = new JButton("Go back");
@@ -292,9 +408,12 @@ public class Client implements IClient{
                     JOptionPane.showMessageDialog(frame, response);
                     writer.println("GET_BOOKINGS " + username + " " + newPassword);
                     writer.flush();
-                    String bookings = reader.readLine().replace(";", "\n");
-                    if (bookings == null) {
+                    String rawBookings = reader.readLine();
+                    String bookings;
+                    if (rawBookings == null) {
                         bookings = "Error in server";
+                    } else {
+                        bookings = rawBookings.replace(";", "\n");
                     }
                     reservationPage(username, newPassword, bookings);
                 } catch (IOException ex) {
@@ -321,16 +440,24 @@ public class Client implements IClient{
 
         addTime(panel);
 
+        int dLabelX = 10; int dLabelW = 150; int dLabelH = 25;
+        int dInputX = 160; int dInputW = 200; int dInputH = 40; int dVSpacing = 12;
+
+        int dY = 20;
+
         JLabel deleteAccountLabel = new JLabel("Username to delete:");
-        deleteAccountLabel.setBounds(10, 20, 150, 25);
+        deleteAccountLabel.setBounds(dLabelX, dY + (dInputH - dLabelH)/2, dLabelW, dLabelH);
         panel.add(deleteAccountLabel);
 
         JTextField deleteAccountTextField = new JTextField(20);
-        deleteAccountTextField.setBounds(160, 20, 200, 25);
+        deleteAccountTextField.setBounds(dInputX, dY, dInputW, dInputH);
+        deleteAccountTextField.setFont(inputFont);
+        deleteAccountTextField.setMargin(new Insets(4,4,4,4));
+        deleteAccountTextField.setBorder(new EmptyBorder(4,6,4,6));
         panel.add(deleteAccountTextField);
 
         JButton deleteAccountButton = new JButton("Confirm Deletion");
-        deleteAccountButton.setBounds(100, 80, 150, 25);
+        deleteAccountButton.setBounds(100, dY + dInputH + dVSpacing, 150, 30);
         panel.add(deleteAccountButton);
 
         JButton menu = new JButton("Go back");
@@ -392,7 +519,8 @@ public class Client implements IClient{
         panel.add(dateLabel);
 
         JComboBox<String> dateComboBox = new JComboBox<>();
-        dateComboBox.setBounds(20, 80, 200, 25);
+        dateComboBox.setBounds(20, 80, 200, 40);
+        dateComboBox.setFont(inputFont);
         panel.add(dateComboBox);
 
         writer.println("GET_DATES");
@@ -406,8 +534,9 @@ public class Client implements IClient{
         timeLabel.setBounds(20, 120, 200, 25);
         panel.add(timeLabel);
 
-        JComboBox timeComboBox = new JComboBox<>();
-        timeComboBox.setBounds(20, 150, 200, 25);
+        JComboBox<String> timeComboBox = new JComboBox<>();
+        timeComboBox.setBounds(20, 150, 200, 40);
+        timeComboBox.setFont(inputFont);
         panel.add(timeComboBox);
 
         writer.println("GET_TIMES " + dateComboBox.getSelectedItem());
@@ -421,8 +550,9 @@ public class Client implements IClient{
         partySize.setBounds(20, 180, 200, 25);
         panel.add(partySize);
 
-        JComboBox partySizeBox = new JComboBox<>();
-        partySizeBox.setBounds(20,210,200,25);
+        JComboBox<Integer> partySizeBox = new JComboBox<>();
+        partySizeBox.setBounds(20,210,200,40);
+        partySizeBox.setFont(inputFont);
 
         for (int i = 1; i <= 10; i++) {
             partySizeBox.addItem(i);
@@ -452,7 +582,8 @@ public class Client implements IClient{
         panel.add(tablesLabel);
 
         JComboBox<String> tableComboBox = new JComboBox<>();
-        tableComboBox.setBounds(20, 270, 120, 25);
+        tableComboBox.setBounds(20, 270, 120, 40);
+        tableComboBox.setFont(inputFont);
         panel.add(tableComboBox);
 
 
@@ -483,7 +614,10 @@ public class Client implements IClient{
         panel.add(cancelLabel);
 
         JTextField cancelTextField = new JTextField();
-        cancelTextField.setBounds(350, 430, 150, 25);
+        cancelTextField.setBounds(350, 430, 150, 40);
+        cancelTextField.setFont(inputFont);
+        cancelTextField.setMargin(new Insets(4,4,4,4));
+        cancelTextField.setBorder(new EmptyBorder(4,6,4,6));
         panel.add(cancelTextField);
 
         JButton cancelButton = new JButton("Confirm cancellation");
@@ -676,7 +810,11 @@ public class Client implements IClient{
     }
     public static void main(String[] args) {
         Client client = new Client();
-        client.connect();
-        client.setGUI();
+
+        Thread connector = new Thread(() -> client.connect(), "Client-Connect-Thread");
+        connector.setDaemon(true);
+        connector.start();
+
+        javax.swing.SwingUtilities.invokeLater(() -> client.setGUI());
     }
 }
