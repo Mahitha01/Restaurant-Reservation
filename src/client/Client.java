@@ -326,12 +326,7 @@ public class Client implements IClient{
                         writer.println("GET_BOOKINGS " + email + " " + password);
                         writer.flush();
                         String rawBookings = reader.readLine();
-                        String bookings;
-                        if (rawBookings == null) {
-                            bookings = "Error in server";
-                        } else {
-                            bookings = rawBookings.replace(";", "\n");
-                        }
+                        String bookings = formatBookingsDisplay(rawBookings);
                         reservationPage(email, password, bookings);
                     }
                 } catch (IOException ex) {
@@ -409,12 +404,7 @@ public class Client implements IClient{
                     writer.println("GET_BOOKINGS " + username + " " + newPassword);
                     writer.flush();
                     String rawBookings = reader.readLine();
-                    String bookings;
-                    if (rawBookings == null) {
-                        bookings = "Error in server";
-                    } else {
-                        bookings = rawBookings.replace(";", "\n");
-                    }
+                    String bookings = formatBookingsDisplay(rawBookings);
                     reservationPage(username, newPassword, bookings);
                 } catch (IOException ex) {
                     ex.printStackTrace();
@@ -567,14 +557,15 @@ public class Client implements IClient{
 
         //4
         JLabel showTables = new JLabel("Display Tables");
-        showTables.setBounds(350, 200, 120, 25);
+        showTables.setBounds(350, 300, 120, 25);
         panel.add(showTables);
 
         JTextArea tablesTextArea = new JTextArea(5, 30);
         tablesTextArea.setEditable(false);
+        tablesTextArea.setFocusable(false);
 
         JScrollPane tablesScrollPane = new JScrollPane(tablesTextArea);
-        tablesScrollPane.setBounds(350, 230, 350, 100);
+        tablesScrollPane.setBounds(350, 330, 350, 100);
         panel.add(tablesScrollPane);
 
         JLabel tablesLabel = new JLabel("Tables Available: ");
@@ -602,31 +593,36 @@ public class Client implements IClient{
 
         JTextArea bookingsTextArea = new JTextArea(5, 30);
         bookingsTextArea.setEditable(false);
+        bookingsTextArea.setFocusable(false);
+        bookingsTextArea.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        bookingsTextArea.setLineWrap(true);
+        bookingsTextArea.setWrapStyleWord(true);
         bookingsTextArea.setText(bookings);
 
         JScrollPane bookingsScrollPane = new JScrollPane(bookingsTextArea);
-        bookingsScrollPane.setBounds(350, 80, 300, 100);
+        bookingsScrollPane.setBounds(350, 80, 350, 200);
         panel.add(bookingsScrollPane);
 
         //6
         JLabel cancelLabel = new JLabel("Cancel Reservation(enter booking ID):");
-        cancelLabel.setBounds(350, 400, 300, 25);
+        cancelLabel.setBounds(350, 450, 300, 25);
         panel.add(cancelLabel);
 
         JTextField cancelTextField = new JTextField();
-        cancelTextField.setBounds(350, 430, 150, 40);
+        cancelTextField.setBounds(350, 480, 150, 40);
         cancelTextField.setFont(inputFont);
         cancelTextField.setMargin(new Insets(4,4,4,4));
         cancelTextField.setBorder(new EmptyBorder(4,6,4,6));
         panel.add(cancelTextField);
 
-        JButton cancelButton = new JButton("Confirm cancellation");
-        cancelButton.setBounds(350, 460, 150, 30);
+        JButton cancelButton = new JButton("Cancel");
+        cancelButton.setBounds(350, 530, 150, 30);
         panel.add(cancelButton);
 
         writer.println("GET_BOOKINGS " + email + " " + password);
-        String updated = reader.readLine().replace(";", "\n");
-        bookingsTextArea.setText(updated);
+        String updated = reader.readLine();
+        String formattedBookings = formatBookingsDisplay(updated);
+        bookingsTextArea.setText(formattedBookings);
 
         writer.println("GET_REALTIME_TABLES " + dateComboBox.getSelectedItem() + " " +
                 timeComboBox.getSelectedItem() + " 0");
@@ -730,8 +726,8 @@ public class Client implements IClient{
                     JOptionPane.showMessageDialog(frame, response1);
 
                     writer.println("GET_BOOKINGS " + email + " " + password);
-                    String updated = reader.readLine().replace(";", "\n");
-                    bookingsTextArea.setText(updated);
+                    String updated = reader.readLine();
+                    bookingsTextArea.setText(formatBookingsDisplay(updated));
 
                     tableComboBox.removeAllItems();
                     writer.println("GET_REALTIME_TABLES " + dateComboBox.getSelectedItem() + " " +
@@ -773,8 +769,8 @@ public class Client implements IClient{
                     JOptionPane.showMessageDialog(frame, response1);
 
                     writer.println("GET_BOOKINGS " + email + " " + password);
-                    String updated = reader.readLine().replace(";", "\n");
-                    bookingsTextArea.setText(updated);
+                    String updated = reader.readLine();
+                    bookingsTextArea.setText(formatBookingsDisplay(updated));
 
                     tableComboBox.removeAllItems();
                     writer.println("GET_REALTIME_TABLES " + dateComboBox.getSelectedItem() + " " +
@@ -808,6 +804,72 @@ public class Client implements IClient{
 
         panel.repaint();
     }
+
+    /**
+     * Formats booking information
+     * @param rawBookings The raw booking string from the server
+     * @return A formatted string with each booking on separate lines with clear labels
+     */
+    private String formatBookingsDisplay(String rawBookings) {
+        if (rawBookings == null || rawBookings.isEmpty() || rawBookings.equals("Error in server")) {
+            return "You have no reservations at this time";
+        }
+
+        StringBuilder formatted = new StringBuilder();
+        String[] bookings = rawBookings.split(";");
+
+        if (bookings.length == 0 || (bookings.length == 1 && bookings[0].trim().isEmpty())) {
+            return "you have no reservations at this time";
+        }
+
+        for (int i = 0; i < bookings.length; i++) {
+            String booking = bookings[i].trim();
+            if (booking.isEmpty()) continue;
+
+            try {
+                String[] parts = booking.split(",");
+                String partySize = "";
+                String dateTime = "";
+                String id = "";
+                String table = "";
+
+                for (String part : parts) {
+                    part = part.trim();
+                    if (part.startsWith("PartySize:")) {
+                        partySize = part.substring(10).trim();
+                    } else if (part.startsWith("Time:")) {
+                        dateTime = part.substring(5).trim();
+                    } else if (part.contains("ID:")) {
+                        String[] idAndTable = part.split("Booked Table:");
+                        if (idAndTable.length >= 1) {
+                            id = idAndTable[0].replace("ID:", "").trim();
+                        }
+                        if (idAndTable.length >= 2) {
+                            table = idAndTable[1].trim();
+                        }
+                    }
+                }
+
+                String date = "";
+                String time = "";
+                if (dateTime.contains(" ")) {
+                    String[] dt = dateTime.split(" ", 2);
+                    date = dt[0];
+                    time = dt.length > 1 ? dt[1] : "";
+                }
+
+                formatted.append("Table ").append(table).append(" for ").append(partySize)
+                         .append(" ").append(partySize.equals("1") ? "guest" : "guests").append(" on ").append(date)
+                         .append(" at ").append(time).append(" (ID: ").append(id).append(")\n");
+
+            } catch (Exception e) {
+                formatted.append(booking).append("\n");
+            }
+        }
+
+        return formatted.toString();
+    }
+
     public static void main(String[] args) {
         Client client = new Client();
 
