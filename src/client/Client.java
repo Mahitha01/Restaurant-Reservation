@@ -109,12 +109,13 @@ public class Client implements IClient{
         addTime(panel);
 
         int frameWidth = frame.getWidth();
+        int frameHeight = frame.getHeight();
         int buttonWidth = 150;
         int buttonHeight = 30;
         int spacing = 30;
         int totalWidth = 3 * buttonWidth + 2 * spacing;
         int startX = (frameWidth - totalWidth) / 2;
-        int y = 30;
+        int y = (frameHeight - buttonHeight) / 2;
 
         JButton loginButton = new JButton("Login");
         loginButton.setBounds(startX, y, buttonWidth, buttonHeight);
@@ -172,16 +173,17 @@ public class Client implements IClient{
             dateLabel = null;
         }
 
+        int x = 10;
         int y = 10;
         if (frame != null) {
-            y = frame.getHeight() - 50;
+            y = frame.getHeight() - 70;
         } else if (panel != null) {
-            y = panel.getHeight() - 50;
+            y = panel.getHeight() - 70;
         }
         if (y < 10) y = 10;
 
         dateLabel = new JLabel("Date: " + LocalDateTime.now().format(fmt));
-        dateLabel.setBounds(10, y, 300, 25);
+        dateLabel.setBounds(x, y, 300, 25);
         dateLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
         panel.add(dateLabel);
 
@@ -199,7 +201,7 @@ public class Client implements IClient{
                 @Override
                 public void componentResized(ComponentEvent e) {
                     if (dateLabel == null) return;
-                    int newY = frame.getHeight() - 50;
+                    int newY = frame.getHeight() - 70;
                     if (newY < 10) newY = 10;
                     dateLabel.setBounds(10, newY, 300, 25);
                 }
@@ -220,12 +222,13 @@ public class Client implements IClient{
 
         Font btnFont = new Font("SansSerif", Font.BOLD, 14);
         int frameWidth = frame.getWidth();
+        int frameHeight = frame.getHeight();
         int buttonWidth = 150;
         int buttonHeight = 30;
         int spacing = 30;
         int totalWidth = 3 * buttonWidth + 2 * spacing;
         int startX = (frameWidth - totalWidth) / 2;
-        int y = 30;
+        int y = (frameHeight - buttonHeight) / 2;
 
         JButton loginButton = new JButton("Login");
         loginButton.setBounds(startX, y, buttonWidth, buttonHeight);
@@ -535,11 +538,11 @@ public class Client implements IClient{
         }
 
         JLabel timeLabel = new JLabel("Select Time:");
-        timeLabel.setBounds(20, 120, 200, 25);
+        timeLabel.setBounds(20, 130, 200, 25);
         panel.add(timeLabel);
 
         JComboBox<String> timeComboBox = new JComboBox<>();
-        timeComboBox.setBounds(20, 150, 200, 40);
+        timeComboBox.setBounds(20, 160, 200, 40);
         timeComboBox.setFont(inputFont);
         panel.add(timeComboBox);
 
@@ -551,11 +554,11 @@ public class Client implements IClient{
         }
         //2
         JLabel partySize = new JLabel("Number of attendees:");
-        partySize.setBounds(20, 180, 200, 25);
+        partySize.setBounds(20, 210, 200, 25);
         panel.add(partySize);
 
         JComboBox<Integer> partySizeBox = new JComboBox<>();
-        partySizeBox.setBounds(20,210,200,40);
+        partySizeBox.setBounds(20, 240, 200, 40);
         partySizeBox.setFont(inputFont);
 
         for (int i = 1; i <= 10; i++) {
@@ -565,8 +568,17 @@ public class Client implements IClient{
         panel.add(partySizeBox);
 
         //3
+        JLabel tablesLabel = new JLabel("Tables Available: ");
+        tablesLabel.setBounds(20, 290, 120, 25);
+        panel.add(tablesLabel);
+
+        JComboBox<String> tableComboBox = new JComboBox<>();
+        tableComboBox.setBounds(20, 320, 120, 40);
+        tableComboBox.setFont(inputFont);
+        panel.add(tableComboBox);
+
         JButton reserveButton = new JButton("Confirm Reservation");
-        reserveButton.setBounds(20, 310, 160, 30);
+        reserveButton.setBounds(20, 370, 160, 30);
         panel.add(reserveButton);
 
         //4
@@ -582,14 +594,6 @@ public class Client implements IClient{
         tablesScrollPane.setBounds(350, 330, 350, 100);
         panel.add(tablesScrollPane);
 
-        JLabel tablesLabel = new JLabel("Tables Available: ");
-        tablesLabel.setBounds(20, 240, 120, 25);
-        panel.add(tablesLabel);
-
-        JComboBox<String> tableComboBox = new JComboBox<>();
-        tableComboBox.setBounds(20, 270, 120, 40);
-        tableComboBox.setFont(inputFont);
-        panel.add(tableComboBox);
 
 
         writer.println("GET_REALTIME_TABLES " + dateComboBox.getSelectedItem() + " " +
